@@ -68,7 +68,7 @@ function UpdatePlace(){
         fetchItem(placeId.id);
         console.log(loading);
         getFormData();
-    },[placeId.id, fetchItem]);
+    },[placeId.id, fetchItem, placeData]);
 
 
     function getFormData(){
