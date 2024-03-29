@@ -18,3 +18,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore();
 //const auth = getAuth(app);
+
+//allow create, update, delete, write: if request.auth != null && request.auth.uid == request.resource.data.author_uid

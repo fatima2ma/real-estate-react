@@ -1,26 +1,19 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
-import { db } from '../firebase.config';
-import { getAuth,
-        updateEmail,
-        updateProfile,
-        verifyBeforeUpdateEmail,
-        signOut} from 'firebase/auth';
-import { collection,
-        query,
-        where,
-        getDocs,
-        doc,
-        deleteDoc,
-        updateDoc} from 'firebase/firestore';
+import { useState, useEffect, useContext } from 'react';
+import { getAuth } from 'firebase/auth';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
-import img from '../img.jpg';
 import FormItem from '../components/FormItem';
 import Button from '../components/Button';
 import { Link } from 'react-router-dom';
 import MidWrraper from '../components/MidWrraper';
+import LoadingWrapp from '../components/LoadingWrapp';
+import SectionLoading from '../components/SectionLoading';
+import Loading from '../components/Loading';
+import LoadBtn from '../components/LoadBtn';
+import CategoryContext from '../context/CategoryContext';
+import AuthContext from '../context/AuthContext';
 
 const Form = styled.form`
     margin: 2rem 0;
@@ -56,61 +49,65 @@ const CardsWrraper = styled.ul`
 
 function Profile(){
     const auth = getAuth();
-    console.log(auth.currentUser);
     const [formDataUser, setFormDataUser] = useState({
         email: auth.currentUser.email,
         username: auth.currentUser.displayName,
     });
-    const [items, setItems] = useState([]);
     const {email, username} = formDataUser;
-    
-    async function fetchData(){
-        const que = query(collection(db, 'places'), where('userRef', '==', 'h9TKLQkWgRPnZReH25vDU4JFarw1'));
-        const docs = await getDocs(que);
-        const temp = [];
-        docs.forEach(doc => {
-            //console.log(doc.id, '=>', doc.data());
-            temp.push({id: doc.id, data: doc.data()});
-        })
-        setItems(temp);
-    };  
+
+    const {updateAuth} = useContext(AuthContext);
+    const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData, deleteData } = useContext(CategoryContext);
     
     useEffect(() =>{
-       fetchData();
+       fetchData('userRef', '==', auth.currentUser.uid);
     },[auth.currentUser.uid]);
+
+    function handlefetchMoreData(){
+        fetchMoreData('userRef', '==', auth.currentUser.uid, lastFetched);
+    }
     
     function onChange(e){
-            setFormDataUser((prevStatus) => ({
-                ...prevStatus,
-                [e.target.id]: e.target.value,
-            }))
+        setFormDataUser((prevStatus) => ({
+            ...prevStatus,
+            [e.target.id]: e.target.value,
+        }))
     }
     
-    async function onSubmit(e){
+    function onSubmit(e){
         e.preventDefault();
-        //console.log(formDataUser.email);
-//        if(auth.currentUser.email !== email){
-//           const verfy = await verifyBeforeUpdateEmail(auth.currentUser, email);
-//            auth.onAuthStateChanged(authuser => {
-//                console.log(authuser);
-//            })
-//            await signOut(auth);
-//        }
-        if(auth.currentUser.displayName && auth.currentUser.displayName !== username )
-            await updateProfile(auth.currentUser, {displayName: username});
-        const docRef = doc(db, 'users', auth.currentUser.uid);
-        await updateDoc(docRef, formDataUser);         
+        updateAuth(username);       
     }
     
-    async function onDeleteClick(id){
-        console.log(id);
-        try{
-            const result = await deleteDoc(doc(db, 'places', id));
-            setItems(items.filter(item => item.id !== id));
-        }catch(error){
-            console.log(error);
-        }
+    function onDeleteClick(id){
+        deleteData(id);
     }
+
+    const [tree, setTree] = useState({
+        title: 'squareThumb',
+        thumbnail: true,
+        header: false,
+        body: {
+            type: 'list',
+            title: true,
+            items: 2,
+        },
+        subTitle: {
+            type: 'subTitle',
+            items: 3,
+        },
+        breakline: false,
+    });
+
+    const [Titletree, setTitleTree] = useState({
+        title: 'titleTree',
+        header: false,
+        body: {
+            type: 'list',
+            title: false,
+            items: 1,
+        },
+    });
+
     return(
         <>
         <SectionWrraper classStyle=''>
@@ -128,49 +125,37 @@ function Profile(){
         </MidWrraper>
         </SectionWrraper>
         <SectionWrraper>
-        <SectionHeader title='Recent offers' subTitle='Show more places' hasLink={true}/>
-        <CardsWrraper>
-        {items.map(item => 
-            <Card key={item.id}
-                id={item.id}
-                title={item.data.title}
-                thumbnail={item.data.imagesURLs[0]}
-                padge='17 days ago'
-                price={item.data.price}
-                location={item.data.adress}
-                beds={item.data.beds}
-                baths={item.data.paths}
-                deleteClick={()=> onDeleteClick(item.id)}/>
-        )}
-            <Card title='Routes are perhaps the most important part of a React Router app'
-                thumbnail={img}
-                padge='17 days ago'
-                price='1,987$'
-                location='Room 92/9 street hyetsh eooxj kjfybbcgs bcyrtsld gftryu ndhyk'
-                beds='4'
-                baths='2'/>
-            <Card title='Routes are perhaps the most important part of a React Router app'
-                thumbnail={img}
-                padge='17 days ago'
-                price='1,987$'
-                location='Room 92/9 street hyetsh eooxj kjfybbcgs bcyrtsld gftryu ndhyk'
-                beds='4'
-                baths='2'/>
-            <Card title='Routes are perhaps the most important part of a React Router app'
-                thumbnail={img}
-                padge='17 days ago'
-                price='1,987$'
-                location='Room 92/9 street hyetsh eooxj kjfybbcgs bcyrtsld gftryu ndhyk'
-                beds='4'
-                baths='2'/>
-            <Card title='Routes are perhaps the most important part of a React Router app'
-                thumbnail={img}
-                padge='17 days ago'
-                price='1,987$'
-                location='Room 92/9 street hyetsh eooxj kjfybbcgs bcyrtsld gftryu ndhyk'
-                beds='4'
-                baths='2'/>
-        </CardsWrraper>
+        {loading ? (<>
+            <SectionLoading>
+                <LoadingWrapp className={`${Titletree.title} LoadingWrapp`}><Loading tree={Titletree}/></LoadingWrapp>
+            </SectionLoading>
+            <SectionLoading>
+                {[...Array(3)].map((_, i) => 
+                    <LoadingWrapp key={i} className={`${tree.title} LoadingWrapp`}><Loading tree={tree}/></LoadingWrapp>
+                )}                       
+            </SectionLoading>
+        </>) : (
+        <>
+            <SectionHeader title='Recent offers' subTitle='' hasLink={true}/>
+            <CardsWrraper>
+            {places.map(item => 
+                <Card key={item.id}
+                    id={item.id}
+                    title={item.data.title}
+                    thumbnail={item.data.imagesURLs[0]}
+                    padge='17 days ago'
+                    price={item.data.price}
+                    location={item.data.adress}
+                    beds={item.data.beds}
+                    baths={item.data.baths}
+                    deleteClick={() => onDeleteClick(item.id)}/>
+            )}
+            </CardsWrraper>
+            <Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
+                {loadMore? <LoadBtn/> : ''}
+            </Button>
+        </>
+        )}        
         </SectionWrraper>
         </>
     )

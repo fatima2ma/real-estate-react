@@ -95,7 +95,7 @@ function Slider({data, sharedIcon}){
         </ShareIcon>}
         {data && data.map((imageURL, index) => (
             <SwiperSlide key={index}>
-                <Slide style={{background: `url(${imageURL}) center no-repeat`, backgroundSize: "cover",}}>
+                <Slide style={{backgroundImage: `url(${imageURL})`, backgroundSize: "cover", backgroundRepeat:"no-repeat", backgroundPosition:'center'}}>
                 </Slide>
             </SwiperSlide>
         ))}

@@ -3,7 +3,12 @@
     padding: 0; border: 0;
     box-sizing: border-box;
 }
-
+#root, body, html{
+  width: 100%;
+}
+.App{
+  width: 100%;
+}
 .App li{
   list-style-type: none;
 }

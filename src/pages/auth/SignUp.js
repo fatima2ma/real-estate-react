@@ -1,11 +1,5 @@
 
-import { useState } from 'react';
-import {db} from '../../firebase.config';
-import { getAuth, 
-        createUserWithEmailAndPassword, 
-        updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import FormItem from '../../components/FormItem';
 import SectionWrraper from '../../components/SectionWrraper';
@@ -13,6 +7,7 @@ import Wrraper2col from '../../components/Wrraper2col';
 import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 
 const Form = styled.form`
     margin: 2rem 0;
@@ -35,8 +30,6 @@ const CardImg = styled.img`
 `;
 
 function SignUp(){
-    const navigate = useNavigate();
-    const auth = getAuth();
     const [showPass, setShowPass] = useState(false);
     const [formData, setFormData] = useState({
         username:'',
@@ -46,6 +39,8 @@ function SignUp(){
     
     const {username, email, password} = formData;
     
+    const {SignUpAuth} = useContext(AuthContext);
+
     function onChange(e){
         setFormData((prevState) => ({
             ...prevState,
@@ -53,23 +48,9 @@ function SignUp(){
         }));        
     }
     
-    async function onSubmit(e){
+    function onSubmit(e){
         e.preventDefault();
-        try{
-        let userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(auth.currentUser);
-            console.log(userCredential);
-            await updateProfile(userCredential.user,{displayName: username});
-            await setDoc(doc(db,'users', userCredential.user.uid), {
-                email: auth.currentUser.email,
-                username: auth.currentUser.displayName,
-                //add timestamp field
-            });
-            //navigate('/signin');
-        }catch(error) {
-            console.log(error.code);
-            console.log(error.message);
-        }
+        SignUpAuth(username, email, password);
     }
     return(
         <SectionWrraper classStyle='shadow'>

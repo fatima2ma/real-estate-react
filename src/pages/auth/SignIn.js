@@ -1,8 +1,5 @@
 
-import { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { db } from '../../firebase.config';
-import { useNavigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import FormItem from '../../components/FormItem';
 import SectionWrraper from '../../components/SectionWrraper';
@@ -10,6 +7,7 @@ import Wrraper2col from '../../components/Wrraper2col';
 import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 
 const Form = styled.form`
     margin: 2rem 0;
@@ -32,8 +30,6 @@ const CardImg = styled.img`
 `;
 
 function SignIn(){
-    const navigate = useNavigate();
-    const auth = getAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -41,6 +37,8 @@ function SignIn(){
     
     const {email, password} = formData;
     
+    const {SigninAuth} = useContext(AuthContext);
+
     function onChange(e){
         setFormData(prevState => ({
             ...prevState,
@@ -49,14 +47,7 @@ function SignIn(){
     }
     function onSubmit(e){
         e.preventDefault();
-        signInWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
-            const user = userCredential.user;
-            if(user) navigate('/');
-        }).catch(error => {
-            console.log(error.code);
-            console.log(error.message);
-        });            
+        SigninAuth(email,password);        
     }
     return(
         <SectionWrraper classStyle='shadow'>

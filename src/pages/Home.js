@@ -1,13 +1,14 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
-import { db } from '../firebase.config';
-import { getDocs, collection, where, query } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { useState} from 'react';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
 import Slider from '../components/Slider';
-import img from '../img.jpg';
+import LoadingWrapp from '../components/LoadingWrapp';
+import SectionLoading from '../components/SectionLoading';
+import Loading from '../components/Loading';
+import { useContext } from 'react';
+import DataContext from '../context/DataContext';
 
 const CardsWrraper = styled.ul`
     display: grid;
@@ -15,46 +16,50 @@ const CardsWrraper = styled.ul`
 //    grid-template-columns: repeat(4, 1fr);
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    // margin: 1rem 0;
-`; 
+`;
+
 
 function Home(){
-    const [items, setItems] = useState([]);
-    const [sellplaces, setSellplaces] = useState([]);
-    const [rentplaces, setRentplaces] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [ImagesSliderURLs, setImagesSliderURLs] = useState(null);
-    
-    async function fetchData(){
-        const tempSellData = [];
-        const tempRentData = [];
-        const tempSlider = [];
-        try{
-            const queryData = await getDocs(collection(db, 'places'));
-            if(queryData){
-                queryData.forEach(doc => {
-                    doc.data().type === 'rent' ? tempRentData.push({id:doc.id, data: doc.data()}) 
-                    : tempSellData.push({id:doc.id, data: doc.data()});
-                    tempSlider.push(doc.data().imagesURLs);
-                    setLoading(false);
-                });
-            }
-        }catch(error){
-            console.log(error);
-            setLoading(false);
-        }
-        setItems(tempRentData, tempSellData);
-        setSellplaces(tempSellData);
-        setRentplaces(tempRentData);
-        setImagesSliderURLs(tempSlider[0]);
-    };
-    
-    useEffect(() => {
-        fetchData();
-    },[]);
-    
+    const {sellplaces, rentplaces, loading, ImagesSliderURLs} = useContext(DataContext);
+   
+    const [tree, setTree] = useState({
+        title: 'squareThumb',
+        thumbnail: true,
+        header: false,
+        body: {
+            type: 'list',
+            title: true,
+            items: 2,
+        },
+        subTitle: {
+            type: 'subTitle',
+            items: 3,
+        },
+        breakline: false,
+    });
+
+    const [Titletree, setTitleTree] = useState({
+        title: 'titleTree',
+        header: true,
+        body: {
+            type: 'list',
+            title: false,
+            items: 1,
+        },
+    });
     return(
         <> 
-        {loading ? (<p>Loading...</p>) : (
+        {loading ? (
+            <SectionWrraper>
+                <SectionLoading>
+                    <LoadingWrapp className={`${Titletree.title} LoadingWrapp`}><Loading tree={Titletree}/></LoadingWrapp>
+                </SectionLoading>
+                <SectionLoading>
+                    {[...Array(4)].map((_, i) => 
+                        <LoadingWrapp key={i} className={`${tree.title} LoadingWrapp`}><Loading tree={tree}/></LoadingWrapp>
+                    )}
+                </SectionLoading>
+            </SectionWrraper>) : (
         <div>
         <Slider data={ImagesSliderURLs}/> 
         <SectionWrraper>

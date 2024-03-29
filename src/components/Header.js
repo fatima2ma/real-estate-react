@@ -1,16 +1,18 @@
+import { useContext } from 'react';
 import styled from 'styled-components';
 import NavbarItem from '../components/NavbarItem';
 import Btn from '../components/Button';
-import {db} from '../firebase.config';
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth} from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 const HeaderWrap = styled.div`
 //    width: 100vw;
     max-width: 1400px;
     height: 40px;
     padding: 0 6rem;
-    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
+    margin-inline: auto;
+    box-shadow: 0px 4px 2px -2px rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     
@@ -50,14 +52,12 @@ const CustLink = styled(Link)`
 function Header(){
     const auth = getAuth();
     const navigate = useNavigate();
+
+    const {signOutAuth} = useContext(AuthContext);
+
     function logout(){
-        if(auth.currentUser)
-            signOut(auth).then(() => {
-                navigate('/');
-            }).catch((error) => {
-                console.log(error.code);
-                console.log(error.message);
-            })
+        console.log('signout');
+        signOutAuth();
     }
     return(
         <HeaderWrap>
@@ -69,7 +69,7 @@ function Header(){
                 <NavbarItem title='Profile' to='/profile'/>              
             </NavCont>
         {auth.currentUser ? 
-            <Btn type='button' onClick={logout} title='logout' backColor='gray' width='auto'/>
+            <Btn type='button' onClick={logout} title='logout' backColor='gray' width='auto' lineHeight='unset'/>
             :
             <CustLink to='./signin'>Login</CustLink>
         }

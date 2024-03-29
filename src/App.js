@@ -15,17 +15,19 @@ import AddPlace from './pages/AddPlace';
 import UpdatePlace from './pages/UpdatePlace';
 import PrivateRoute from './components/PrivateRoute';
 import Categoreis from './pages/Categoreis';
+import AppContext from './context/AppContext';
 
 function App() {
   return ( 
     <BrowserRouter>  
-    <div className="App">
-      <Header/>
+    <div className="App">      
+      <AppContext>
+        <Header/>
         <Routes>
             <Route path="/" element={<Home/>}/>
             <Route path="/home" element={<Home/>}/>
             <Route path="/offers" element={<Offers/>}/>
-            <Route path="/places" element={<Home/>}/>
+            <Route path="/places" element={<Places/>}/>
             <Route path="/places/:categoryName" element={<Categoreis/>}/>
             <Route path="/place/:id" element={<PlaceDetail/>}/>
             <Route path="/new" element={<PrivateRoute/>}>
@@ -41,9 +43,10 @@ function App() {
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/forgotpassword" element={<ForgotPassword/>}/>
             <Route path="/cards" element={<CardsWithcolumns/>}/>
-        </Routes>
+          </Routes>
+        </AppContext>
     </div>
-    </BrowserRouter>
+    </BrowserRouter>    
   );
 }
 

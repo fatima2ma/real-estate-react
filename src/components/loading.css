@@ -1,0 +1,150 @@
+:root{
+    --cardBg: #252835;
+    --elemBg: #9c9c9c;
+    --movingElemBg: #dadada;
+}
+
+.loading, .loading > *{
+    display: flex;
+    gap: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hide-elem{
+    opacity: 0;
+}
+
+.loading .animate{
+    animation: interFromLeft 1s ease-in-out;
+    transform-origin: 100% 10%;
+}
+
+.loading{
+    height: fit-content;
+    padding: 7% 3%;
+    overflow: hidden;
+}
+
+.loading .body{
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.header, .list .title, .list .listItem, .thumbnail, .text .title{
+    height: 15px;
+    background: var(--elemBg);
+    border-radius: 5px;
+}
+
+.thumbnail{
+    aspect-ratio:  4 / 3;
+    height: 30%;
+    width: 25%;
+    border-radius: 50%;
+}
+
+.squareThumb .thumbnail{
+    /* height: auto;
+    width: 100%; */
+    border-radius: 5px;
+}
+
+.header{
+    margin: .5rem 0;
+    width: 25%;
+    overflow: hidden;
+}
+
+.loadAnim{
+    position: relative;
+    overflow: hidden;
+}
+
+.loadAnim:before{
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    margin-left: -10px;
+    opacity: 1;
+    background: var(--movingElemBg);
+    box-shadow: 0 0 15px 10px var(--movingElemBg);
+    transform: skewX(-20deg);
+    animation: loading 2s cubic-bezier(0.3, 0.7, 0.62, 0.91) infinite;
+}
+
+.loadAnim.list:before, 
+.loadAnim.text:before,
+.loadAnim.box:before,
+.loadAnim.subTitle:before{
+    display: none;
+}
+
+.title, .text .title{
+    width: 20%;
+}
+.list, .listItem{
+    width: 80%;
+}
+.breakline{
+    width: 80%;
+    height: 2px;
+    margin: .5rem auto;
+    background: var(--elemBg);
+    border-radius: 5px;
+}
+
+.text{
+    width: 80%;
+    height: fit-content;
+}
+.text .listItem{
+    width: 80%;
+    height: 30px;
+    background: var(--elemBg);
+    border-radius: 5px;
+}
+
+.box{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    height: 70%;
+    width: 80%;
+    gap: .5rem;
+}
+
+.box .title{
+    flex: 1 0 100%;
+    height: 15%;
+    background: var(--elemBg);
+    border-radius: 5px;
+}
+
+.box .listItem{
+    height: 60px;
+    flex: 1 0 calc(50% - 0.5rem);
+    background: var(--elemBg);
+    border-radius: 5px;
+}
+
+.subTitle{
+    width: 80%;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.subTitle .listItem{
+    display: inline-block;
+    width: 25%;
+    height: 15px;
+    border-radius: 5px;
+    background: var(--elemBg);
+}
+
+@keyframes loading {
+    0%{margin-left: -15px; opacity: 1;}
+    100%{margin-left: 110%; opacity: 1;}
+}

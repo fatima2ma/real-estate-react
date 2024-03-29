@@ -1,15 +1,12 @@
 import styled from 'styled-components';
-import { useState } from 'react';
-import { db } from '../../firebase.config';
-import { getAuth,
-       sendPasswordResetEmail,
-       updatePassword } from 'firebase/auth';
+import { useContext, useState } from 'react';
 import FormItem from '../../components/FormItem';
 import SectionWrraper from '../../components/SectionWrraper';
 import Wrraper2col from '../../components/Wrraper2col';
 import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 
 const Form = styled.form`
     margin: 2rem 0;
@@ -33,20 +30,15 @@ const CardImg = styled.img`
 
 function ForgotPassword(){
     const [email, setEmail] = useState('');
+    const {updatePassword} = useContext(AuthContext);
     
     function onChange(e){
         setEmail(e.target.value);
     };
     
-    async function onSubmit(e){
+    function onSubmit(e){
         e.preventDefault();
-        const auth = getAuth();
-        console.log(email);
-        try{
-            await sendPasswordResetEmail(auth, email);
-        }catch(error){
-            console.log(error.message);
-        }
+        updatePassword(email);
     }
     
     return(

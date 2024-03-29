@@ -1,20 +1,16 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { db } from '../firebase.config';
-import {getDocs, 
-        where, 
-        query, 
-        doc, 
-        limit, 
-        collection, 
-        orderBy, 
-        startAfter} from 'firebase/firestore';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
 import Slider from '../components/Slider';
 import Button from '../components/Button';
+import LoadingWrapp from '../components/LoadingWrapp';
+import SectionLoading from '../components/SectionLoading';
+import Loading from '../components/Loading';
+import LoadBtn from '../components/LoadBtn';
+import { useContext } from 'react';
+import CategoryContext from '../context/CategoryContext';
 
 const CardsWrraper = styled.ul`
     display: grid;
@@ -29,67 +25,56 @@ const MainContent = styled.div`
 `;
 
 function Offers(){
-    const params = useParams();
-    const [places, setPlaces] = useState();
-    const [loading, setLoading] = useState(true);
-    const [lastFetched, setLastFetched] = useState();
-    
-    async function fetchData(){
-        //const category = params.categoryName;
-        try{
-            const q = query(collection(db, 'places'), where('offer', '==', true), limit(8));
-            const dataSnap = await getDocs(q);
-            const tempList = [];
-            if(dataSnap){
-                const lastVisible = dataSnap.docs[dataSnap.docs.length - 1]
-                setLastFetched(lastVisible);                
-                console.log(dataSnap.docs.length);
-                dataSnap.forEach(doc => {
-                    tempList.push({
-                        id: doc.id,
-                        data: doc.data(),
-                    })
-                });
-                setPlaces(tempList);
-                setLoading(false);
-            }
-        }catch(error){
-            console.log(error.message);
-            setLoading(false);
-        }
-    }
-    
-    async function fetchMoreData(){
-        const category = params.categoryName;
-        try{
-            const q = query(collection(db, 'places'), where('offer', '==', true), limit(4), startAfter(lastFetched));
-            const dataSnap = await getDocs(q);
-            if(dataSnap){
-                const lastVisible = dataSnap.docs[dataSnap.docs.length - 1];
-                setLastFetched(lastVisible);
-                const tempList = [];
-                dataSnap.forEach(doc => {
-                    tempList.push({
-                        id: doc.id,
-                        data: doc.data(),
-                    })
-                });
-                setLoading(false);
-                setPlaces((prevState) => [...prevState, ...tempList]);
-            }
-        }catch(error){
-            setLoading(false);
-            console.log(error.message);
-        }
+    const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
+
+    function handlefetchMoreData(){
+        fetchMoreData('offer', '==', true, lastFetched);
     }
     
     useEffect(() => {
-       fetchData(); 
-    },[])
+       fetchData('offer', '==', true); 
+    },[]);
+
+    const [tree, setTree] = useState({
+        title: 'squareThumb',
+        thumbnail: true,
+        header: false,
+        body: {
+            type: 'list',
+            title: true,
+            items: 2,
+        },
+        subTitle: {
+            type: 'subTitle',
+            items: 3,
+        },
+        breakline: false,
+    });
+
+    const [Titletree, setTitleTree] = useState({
+        title: 'titleTree',
+        header: false,
+        body: {
+            type: 'list',
+            title: false,
+            items: 1,
+        },
+    });
+
     return(
         <SectionWrraper>
+            {loading? (<>
+                <SectionLoading>
+                    <LoadingWrapp className={`${Titletree.title} LoadingWrapp`}><Loading tree={Titletree}/></LoadingWrapp>
+                </SectionLoading>
+                <SectionLoading>
+                   {[...Array(3)].map((_, i) => 
+                        <LoadingWrapp key={i} className={`${tree.title} LoadingWrapp`}><Loading tree={tree}/></LoadingWrapp>
+                   )}                       
+                </SectionLoading>
+            </>) : (
+            <>
             <SectionHeader title={`places for offers`}/>
-            {loading? (<div>Loading...</div>) : (
             <MainContent>
             <CardsWrraper>
                 {places && places.map(item => 
@@ -101,12 +86,15 @@ function Offers(){
                     price={item.data.price}
                     location={item.data.adress}
                     beds={item.data.beds}
-                    baths={item.data.paths}
+                    baths={item.data.baths}
                     />
                 )}
             </CardsWrraper>
-            <Button onClick={fetchMoreData} type='button' backColor='#276ce7' width='25%' title='Load more'/>
+            <Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
+                {loadMore? <LoadBtn/> : ''}
+            </Button>
             </MainContent>
+            </>
             )}
         </SectionWrraper>
     )

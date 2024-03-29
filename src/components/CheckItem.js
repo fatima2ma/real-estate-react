@@ -33,7 +33,7 @@ const HorStack = styled.div`
 `;
 
 function CheckItem({title ,lbl, type, placeholder, onChange, value, active}){
-    if(active || active === value.split('/')[0]){console.log(true)};
+    // if(active || active === value.split('/')[0]){console.log(true)};
     return(
         <InputWrrap>
             <Lbl htmlFor={lbl}>{title}</Lbl>

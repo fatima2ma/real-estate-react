@@ -21,11 +21,11 @@ const TextArea = styled.textarea`
     padding: 1rem;
 `;
 
-function TextAreaItem({title ,lbl, type, placeholder, onChange, value}){
+function TextAreaItem({title ,lbl, type, placeholder, onChange, rows ,value}){
     return(
         <InputWrrap>
             <Lbl htmlFor={lbl}>{title}</Lbl>
-            <TextArea onChange={onChange} id={lbl} placeholder={placeholder} value={value}></TextArea>
+            <TextArea onChange={onChange} id={lbl} placeholder={placeholder} value={value} rows={rows}></TextArea>
         </InputWrrap>
     )
 }

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 const SectionWrrap = styled.div`
     max-width: 1400px;
     padding: 3rem 7rem;
+    margin-inline: auto;
     
     @media (max-width: 575px){
         padding: 0;

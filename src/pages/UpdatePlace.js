@@ -1,20 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-    getStorage,
-    ref,
-    uploadBytesResumable,
-    getDownloadURL,
-    deleteObject
-} from 'firebase/storage';
-import { addDoc, 
-        collection, 
-        serverTimestamp, 
-        getDoc, 
-        doc, 
-        updateDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { db } from '../firebase.config';
 import {styled} from 'styled-components';
 import Button from '../components/Button';
 import FormItem from '../components/FormItem';
@@ -22,6 +7,7 @@ import TextAreaItem from '../components/TextAreaItem';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import CheckItem from '../components/CheckItem';
+import ItemContext from '../context/ItemContext';
 
 const CenteredForm = styled.div`
     width: 40vw;
@@ -42,8 +28,8 @@ const AddForm = styled.form`
 
 function UpdatePlace(){
     const placeId = useParams();
-    const [place, setPlace] = useState({});
-    const [loading, setLoading] = useState(true);
+    // const [place, setPlace] = useState({});
+    // const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
         type:'rent',
         title:'',
@@ -59,6 +45,8 @@ function UpdatePlace(){
         price:0,
         images:[],
     });
+
+    const {placeData, loading, fetchItem, updateItem} = useContext(ItemContext);
     
     const {
        type,
@@ -76,36 +64,24 @@ function UpdatePlace(){
         images, 
     } = formData;  // recheck if is there any need for this
     
-    async function fetchData(){
-        try{
-            const docRef = doc(db, "places", placeId.id);
-            const docSnap = await getDoc(docRef);
-            console.log(placeId.id);
-            if(docSnap.exists()){
-//                console.log(docSnap.data());
-                setLoading(false);
-                setPlace(docSnap.data());
-                setFormData({
-                    ...docSnap.data(),
-                    langtude: docSnap.data().geolocation.lng,
-                    latitude: docSnap.data().geolocation.lat,
-                });
-            }
-        }catch(error){
-            setLoading(true);
-            console.log(error.message);
-        }
-    };
-    
     useEffect(() => {
-       fetchData();
-    },[placeId.id]);
-    
-//    useEffect(() => {
-//        onChange();
-//    },[formData]);
-    
+        fetchItem(placeId.id);
+        console.log(loading);
+        getFormData();
+    },[placeId.id, fetchItem]);
+
+
+    function getFormData(){
+        console.log(loading);
+        !loading && setFormData({
+            ...placeData,
+            langtude: placeData.geolocation.lng,
+            latitude: placeData.geolocation.lat,
+            images: placeData.imagesURLs,
+        });
+    }
     function onChange(e){
+        //setFormData(placeData);
         let boolean = null;
         if(e.target.value === 'true') boolean = true;
         if(e.target.value === 'false') boolean = false;
@@ -123,78 +99,80 @@ function UpdatePlace(){
        }
     };
     
-    async function uploadImages(image){
-        const storage = getStorage();
-        const date = new Date();
-        const fileName = `${image.name}_${date.getMilliseconds()}`;
-        return new Promise((resolve, reject) => {
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, image);
-            if(uploadTask){
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload is ' + progress + '% done');
-                        switch(snapshot.state){
-                            case 'paused':
-                                console.log('upload paused');
-                                break;
-                            case 'running':
-                                console.log('upload running');
-                                break;
-                        }
-                    },(error) => {
-                        reject(error);
-                    },() => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((DownloadUrl) => {resolve(DownloadUrl)});
-                    }
-                );
-            }
-        })
-    }
+    // async function uploadImages(image){
+    //     const storage = getStorage();
+    //     const date = new Date();
+    //     const fileName = `${image.name}_${date.getMilliseconds()}`;
+    //     return new Promise((resolve, reject) => {
+    //         const storageRef = ref(storage, fileName);
+    //         const uploadTask = uploadBytesResumable(storageRef, image);
+    //         if(uploadTask){
+    //             uploadTask.on('state_changed', 
+    //                 (snapshot) => {
+    //                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //                     console.log('Upload is ' + progress + '% done');
+    //                     switch(snapshot.state){
+    //                         case 'paused':
+    //                             console.log('upload paused');
+    //                             break;
+    //                         case 'running':
+    //                             console.log('upload running');
+    //                             break;
+    //                     }
+    //                 },(error) => {
+    //                     reject(error);
+    //                 },() => {
+    //                     getDownloadURL(uploadTask.snapshot.ref).then((DownloadUrl) => {resolve(DownloadUrl)});
+    //                 }
+    //             );
+    //         }
+    //     })
+    // }
     
-    function deleteImage(imageUrl){
-        const storage = getStorage();
-        const storageRef = ref(storage, imageUrl);
-        deleteObject(storageRef).then(()=> {
-            console.log('file deleted')
-        }).catch((error)=>{
-            console.log(error.message);
-        })
-    }
+    // function deleteImage(imageUrl){
+    //     const storage = getStorage();
+    //     const storageRef = ref(storage, imageUrl);
+    //     deleteObject(storageRef).then(()=> {
+    //         console.log('file deleted')
+    //     }).catch((error)=>{
+    //         console.log(error.message);
+    //     })
+    // }
     
     async function onSubmit(e){
         e.preventDefault();
         console.log(formData);
-            //upload images
-            const imagesURLs = await Promise.all([...images].map(image => 
-                uploadImages(image)
-            )).catch((error) => {
-                console.log(error.message);
-            })
-            //console.log( place.imagesURLs[0]); 
-            // delete images
-            place.imagesURLs.map((image) => deleteImage(image));
-            const geolocation = {};
-            geolocation.lat = latitude;
-            geolocation.lng = langtude;
-        const formDataCopy = {
-            ...formData,
-            geolocation,
-            imagesURLs,
-        };
-        delete formDataCopy.images;
-        delete formDataCopy.latitude;            
-        delete formDataCopy.langtude;
+        updateItem(formData, placeId.id);
+    //         //upload images
+    //         const imagesURLs = await Promise.all([...images].map(image => 
+    //             uploadImages(image)
+    //         )).catch((error) => {
+    //             console.log(error.message);
+    //         })
+    //         //console.log( place.imagesURLs[0]); 
+    //         // delete images
+    //         place.imagesURLs.map((image) => deleteImage(image));
+    //         const geolocation = {};
+    //         geolocation.lat = latitude;
+    //         geolocation.lng = langtude;
+    //     const formDataCopy = {
+    //         ...formData,
+    //         geolocation,
+    //         imagesURLs,
+    //     };
+    //     delete formDataCopy.images;
+    //     delete formDataCopy.latitude;            
+    //     delete formDataCopy.langtude;
             
-        const docRef = doc(db, "places", placeId.id);
-        await updateDoc(docRef, formDataCopy)};
+    //     const docRef = doc(db, "places", placeId.id);
+    //     await updateDoc(docRef, formDataCopy)
+    };
     return(
         <SectionWrraper>
             <CenteredForm>
                 <SectionHeader title='Edit Place'/>
                 {loading ? (<p>Loading....</p>) : (
-                (place.geolocation.lng) && 
+                (placeData) && 
                 <AddForm onSubmit={onSubmit}>
                     <CheckItem title='Sell/Rent' type='button' lbl='type' value='sell/rent' onChange={onChange} active={type}/> 
                     <FormItem onChange={onChange} type='text' title='Place Title' lbl='title' value={title} placeholder='' minLength='10' maxLength='32'/>
