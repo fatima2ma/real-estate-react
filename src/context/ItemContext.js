@@ -9,6 +9,7 @@ export const ItemContext = createContext();
 export const ItemContextProvider = ({children}) => {
     const initialData = {
         placeData: {},
+        id:'',
         loading: true,
         progress: 0,
         error: '',
@@ -19,7 +20,8 @@ export const ItemContextProvider = ({children}) => {
             case 'GET_PLACE_SUCCESS': 
                 return {
                     ...state,
-                    placeData: action.payload,
+                    placeData: action.payload.data,
+                    id: action.payload.id,
                     loading: false
                 };
             case 'GET_PLACE_ERROR':
@@ -32,13 +34,14 @@ export const ItemContextProvider = ({children}) => {
             case 'UPDATE_PLACE_DATA':
                 return{
                     ...state,
-                    placeData: [...state.placeData, action.payload],
+                    placeData: [state.placeData, action.payload.dataCopy],
+                    progress: action.payload.prog,
                     loading: false,
                 };
             case 'UPDATE_PLACE_DATA_ERROR':
                 return{
                     ...state,
-                    placeData: [...state.placeData],
+                    placeData: [state.placeData],
                     loading: false,
                     error: action.payload,
                 };
@@ -67,14 +70,14 @@ export const ItemContextProvider = ({children}) => {
     // const [loading, setLoading] = useState(true);
     const fetchItem = useCallback(async (id) => {
         try{
-            console.log('itemfetch');
+            //console.log('itemfetch');
             const dbRef = doc(db, 'places', id);
             const data  = await getDoc(dbRef);
             if(data){
                 // setPlaceData(data.data());
                 // setLoading(false);
-                console.log(data.data());
-                dispatch({type: 'GET_PLACE_SUCCESS', payload: data.data()});
+                console.log(data.id);
+                dispatch({type: 'GET_PLACE_SUCCESS', payload: {id:data.id, data:data.data()}});
             }
         }catch(e){
             // setLoading(false);
@@ -83,56 +86,62 @@ export const ItemContextProvider = ({children}) => {
         }        
     },[]);
 
-    function deleteImage(imageUrl){
+    function deleteImage(imagesUrl){
         const storage = getStorage();
-        const storageRef = ref(storage, imageUrl);
-        deleteObject(storageRef).then(()=> {
-            console.log('file deleted')
-        }).catch((error)=>{
-            console.log(error.message);
-        })
-    }
-
-    async function uploadImages(image){
-        const storage = getStorage();
-        const date = new Date();
-        const fileName = `${image.name}_${date.getMilliseconds()}`;
-        return new Promise((resolve, reject) => {
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, image);
-            if(uploadTask){
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log('Upload is ' + progress + '% done');
-                        switch(snapshot.state){
-                            case 'paused':
-                                console.log('upload paused');
-                                break;
-                            case 'running':
-                                console.log('upload running');
-                                break;
-                        }
-                    },(error) => {
-                        reject(error);
-                    },() => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((DownloadUrl) => {resolve(DownloadUrl)});
-                    }
-                );
-            }
-        })
-    }
-
-    const updateItem = useCallback(async (data, id) => {
-        console.log(data);
-        //upload images
-            const imagesURLs = await Promise.all([...data.images].map(image => 
-                uploadImages(image)
-            )).catch((error) => {
+        imagesUrl.map(imageUrl =>{ 
+            const storageRef = ref(storage, imageUrl);
+            deleteObject(storageRef).then(()=> {
+                console.log('file deleted')
+            }).catch((error)=>{
                 console.log(error.message);
             })
-            console.log(imagesURLs[0]); 
-            delete data.images
+        })
+    }
+
+    const updateItem = useCallback(async (data, id, oldImages) => {
+        //let progress = [];
+        async function uploadImages(image){
+            const storage = getStorage();
+            const date = new Date();            
+            const fileName = `${image.name}_${date.getMilliseconds()}`;
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, fileName);
+                const uploadTask = uploadBytesResumable(storageRef, image);
+                if(uploadTask){
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            state.progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload is ' + state.progress + '% done');
+                            switch(snapshot.state){
+                                case 'paused':
+                                    console.log('upload paused');
+                                    break;
+                                case 'running':
+                                    console.log('upload running');
+                                    break;
+                            }
+                        },(error) => {
+                            reject(error);
+                        },() => {
+                            getDownloadURL(uploadTask.snapshot.ref).then((DownloadUrl) => {resolve(DownloadUrl)});
+                        }
+                    );
+                }
+            })
+        }
+        //console.log(data);
+        //upload images
+            let imagesURLs = [];
+            if(data.images != undefined){
+                imagesURLs = await Promise.all([...data.images].map(image => 
+                    uploadImages(image)
+                )).catch((error) => {
+                    console.log(error.message);
+                })
+            }
+            //console.log(imagesURLs[0]); 
+            delete data.images;
+            imagesURLs = [...imagesURLs, ...oldImages];
             // imagesURLs.map((image) => deleteImage(image));
             const geolocation = {};
             geolocation.lat = data.latitude;
@@ -148,11 +157,11 @@ export const ItemContextProvider = ({children}) => {
         try{    
             const docRef = doc(db, "places", id);
             await updateDoc(docRef, dataCopy);
-            dispatch({type:'UPDATE_PLACE_DATA', payload: dataCopy});
+            dispatch({type:'UPDATE_PLACE_DATA', payload: {dataCopy: dataCopy, prog: state.progress }});
         }catch(e){
             dispatch({type: 'UPDATE_PLACE_DATA_ERROR', payload: e.message})
         }
-    },[]);
+    },[state.progress]);
 
     const addPlace = useCallback(async(data) => {
         const auth = getAuth();
@@ -225,7 +234,7 @@ export const ItemContextProvider = ({children}) => {
     },[state.progress]);
 
     return(
-        <ItemContext.Provider value={{...state, fetchItem, updateItem, addPlace}}>
+        <ItemContext.Provider value={{...state, fetchItem, updateItem, addPlace, deleteImage}}>
             {children}
         </ItemContext.Provider>
     )

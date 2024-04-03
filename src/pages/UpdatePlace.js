@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {styled} from 'styled-components';
 import Button from '../components/Button';
 import FormItem from '../components/FormItem';
@@ -8,6 +8,8 @@ import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import CheckItem from '../components/CheckItem';
 import ItemContext from '../context/ItemContext';
+import DisplayImages from '../components/DisplayImages';
+import Wrraper2col from '../components/Wrraper2col';
 
 const CenteredForm = styled.div`
     width: 40vw;
@@ -23,13 +25,32 @@ const AddForm = styled.form`
     display: flex;
     flex-direction: column;
     gap: 2rem;
+
+    & .formItems{
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        justify-content: space-between;
+    }
+`;
+
+const ExtendedItem = styled.div`
+    // grid-column: 1 / end;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 2rem 0;
 `;
 
 
 function UpdatePlace(){
-    const placeId = useParams();
+    const params = useParams();
+    const navigate = useNavigate();
     // const [place, setPlace] = useState({});
     // const [loading, setLoading] = useState(true);
+    const [files, setFiles] = useState([]);
     const [formData, setFormData] = useState({
         type:'rent',
         title:'',
@@ -46,7 +67,7 @@ function UpdatePlace(){
         images:[],
     });
 
-    const {placeData, loading, fetchItem, updateItem} = useContext(ItemContext);
+    const {placeData, id, loading, error, progress, fetchItem, updateItem, deleteImage} = useContext(ItemContext);
     
     const {
        type,
@@ -63,22 +84,23 @@ function UpdatePlace(){
         price,
         images, 
     } = formData;  // recheck if is there any need for this
+    const [oldImages, setOldImages] = useState([]);
+    const [mustDeleteImgs, setMustDeleteImgs] = useState([]);
     
     useEffect(() => {
-        fetchItem(placeId.id);
-        console.log(loading);
+        fetchItem(params.id);
+        console.log(placeData);
         getFormData();
-    },[placeId.id, fetchItem, placeData]);
-
+    },[loading, id]);
 
     function getFormData(){
-        console.log(loading);
-        !loading && setFormData({
+        (!loading && placeData.geolocation.lng != undefined) && setFormData({
             ...placeData,
             langtude: placeData.geolocation.lng,
             latitude: placeData.geolocation.lat,
-            images: placeData.imagesURLs,
+            // images: placeData.imagesURLs,
         });
+        !loading && setOldImages(placeData.imagesURLs);
     }
     function onChange(e){
         //setFormData(placeData);
@@ -86,6 +108,8 @@ function UpdatePlace(){
         if(e.target.value === 'true') boolean = true;
         if(e.target.value === 'false') boolean = false;
         if(e.target.files){
+            const selectedFiles = Array.from(e.target.files);
+            setFiles([...selectedFiles]);
             setFormData(prevState => ({
                 ...prevState,
                 images: e.target.files,
@@ -97,105 +121,53 @@ function UpdatePlace(){
                 [e.target.id]: boolean ?? e.target.value,   
            }))
        }
+    //    console.log(formData.images);
     };
-    
-    // async function uploadImages(image){
-    //     const storage = getStorage();
-    //     const date = new Date();
-    //     const fileName = `${image.name}_${date.getMilliseconds()}`;
-    //     return new Promise((resolve, reject) => {
-    //         const storageRef = ref(storage, fileName);
-    //         const uploadTask = uploadBytesResumable(storageRef, image);
-    //         if(uploadTask){
-    //             uploadTask.on('state_changed', 
-    //                 (snapshot) => {
-    //                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //                     console.log('Upload is ' + progress + '% done');
-    //                     switch(snapshot.state){
-    //                         case 'paused':
-    //                             console.log('upload paused');
-    //                             break;
-    //                         case 'running':
-    //                             console.log('upload running');
-    //                             break;
-    //                     }
-    //                 },(error) => {
-    //                     reject(error);
-    //                 },() => {
-    //                     getDownloadURL(uploadTask.snapshot.ref).then((DownloadUrl) => {resolve(DownloadUrl)});
-    //                 }
-    //             );
-    //         }
-    //     })
-    // }
-    
-    // function deleteImage(imageUrl){
-    //     const storage = getStorage();
-    //     const storageRef = ref(storage, imageUrl);
-    //     deleteObject(storageRef).then(()=> {
-    //         console.log('file deleted')
-    //     }).catch((error)=>{
-    //         console.log(error.message);
-    //     })
-    // }
     
     async function onSubmit(e){
         e.preventDefault();
-        console.log(formData);
-        updateItem(formData, placeId.id);
-    //         //upload images
-    //         const imagesURLs = await Promise.all([...images].map(image => 
-    //             uploadImages(image)
-    //         )).catch((error) => {
-    //             console.log(error.message);
-    //         })
-    //         //console.log( place.imagesURLs[0]); 
-    //         // delete images
-    //         place.imagesURLs.map((image) => deleteImage(image));
-    //         const geolocation = {};
-    //         geolocation.lat = latitude;
-    //         geolocation.lng = langtude;
-    //     const formDataCopy = {
-    //         ...formData,
-    //         geolocation,
-    //         imagesURLs,
-    //     };
-    //     delete formDataCopy.images;
-    //     delete formDataCopy.latitude;            
-    //     delete formDataCopy.langtude;
-            
-    //     const docRef = doc(db, "places", placeId.id);
-    //     await updateDoc(docRef, formDataCopy)
+        // console.log(formData.images);
+        deleteImage(mustDeleteImgs);
+        updateItem(formData, params.id, oldImages);
+        //if(error == '') navigate(`/place/${params.id}`);
     };
     return(
         <SectionWrraper>
-            <CenteredForm>
+            {/* <CenteredForm> */}
                 <SectionHeader title='Edit Place'/>
                 {loading ? (<p>Loading....</p>) : (
                 (placeData) && 
                 <AddForm onSubmit={onSubmit}>
-                    <CheckItem title='Sell/Rent' type='button' lbl='type' value='sell/rent' onChange={onChange} active={type}/> 
-                    <FormItem onChange={onChange} type='text' title='Place Title' lbl='title' value={title} placeholder='' minLength='10' maxLength='32'/>
-                    <HorStack>
-                        <FormItem type='number' title='Beds' lbl='beds' onChange={onChange} min='1' max='50' value={beds}/>
-                        <FormItem type='number' title='Paths' lbl='baths' onChange={onChange} min='1' max='50' value={baths}/>
-                    </HorStack>
-                    <CheckItem title='Parking' type='button' lbl='parking' value='yes/no' onChange={onChange} active={parking}/>
-                    <CheckItem title='Furnished' type='button' lbl='furnished' value='yes/no' onChange={onChange} active={furnished}/>
-                    <FormItem type='text' title='Adress' lbl='adress' placeholder='' onChange={onChange} value={adress}/>
-                    <HorStack>
-                        <FormItem type='number' title='langtude' lbl='langtude' onChange={onChange} min='-180.00000' max='180.00000' step='0.000001' value={langtude}/>
-                        <FormItem type='number' title='latitude' lbl='latitude' onChange={onChange} min='-90.00000' max='90.00000' step='0.000001' value={latitude}/>
-                    </HorStack>
-                    <TextAreaItem title='Description' lbl='description' placeholder='' onChange={onChange} value={description}/>
-                    <CheckItem title='Offer' type='button' lbl='offer' value='yes/no' onChange={onChange} active={offer}/>
-                    <FormItem type='number' title='Reguler Price' lbl='price' onChange={onChange} min='50' max='400000000' value={price}/>
-                    <FormItem type='file' title='Images' lbl='images' onChange={onChange} multiple={true} accept='.png,.jpg,.jpeg'/>
-                    
-                    <Button title='edit place' type='submit'/>
+                    <Wrraper2col>
+                        <section className='formItems'>
+                            <FormItem onChange={onChange} type='text' title='Place Title' lbl='title' value={title} placeholder='' minLength='10' maxLength='32'/>
+                            <FormItem type='text' title='Adress' lbl='adress' placeholder='' onChange={onChange} value={adress}/>
+                            <HorStack>
+                                <FormItem type='number' title='langtude' lbl='langtude' onChange={onChange} min='-180.00000' max='180.00000' step='0.000001' value={langtude}/>
+                                <FormItem type='number' title='latitude' lbl='latitude' onChange={onChange} min='-90.00000' max='90.00000' step='0.000001' value={latitude}/>
+                            </HorStack>
+                            <TextAreaItem title='Description' lbl='description' placeholder='' onChange={onChange} value={description}/>
+                        </section>
+                        <section className='formItems'>
+                            <CheckItem title='Sell/Rent' type='button' lbl='type' value='sell/rent' onChange={onChange} active={type}/> 
+                            <CheckItem title='Parking' type='button' lbl='parking' value='yes/no' onChange={onChange} active={parking}/>
+                            <CheckItem title='Furnished' type='button' lbl='furnished' value='yes/no' onChange={onChange} active={furnished}/>                    
+                            <CheckItem title='Offer' type='button' lbl='offer' value='yes/no' onChange={onChange} active={offer}/>
+                            <HorStack>
+                                <FormItem type='number' title='Beds' lbl='beds' onChange={onChange} min='1' max='50' value={beds}/>
+                                <FormItem type='number' title='Paths' lbl='baths' onChange={onChange} min='1' max='50' value={baths}/>
+                            </HorStack>                    
+                            <FormItem type='number' title='Reguler Price' lbl='price' onChange={onChange} min='50' max='400000000' value={price}/>
+                        </section>
+                    {/* <FormItem type='file' title='Images' lbl='images' onChange={onChange} multiple='true' accept='.png,.jpg,.jpeg'/> */}
+                    <ExtendedItem>
+                        <DisplayImages files={files} oldImages={oldImages} setOldImages={setOldImages} mustDeleteImgs={mustDeleteImgs} setMustDeleteImgs={setMustDeleteImgs} progress={progress} setFiles={setFiles} onChange={onChange} deleteImage={deleteImage}/>
+                    </ExtendedItem>
+                    <Button title='Update Place' type='submit' width='50%' gridCol='1'/>
+                    </Wrraper2col>
                 </AddForm>
                 )}
-            </CenteredForm>
+            {/* </CenteredForm> */}
         </SectionWrraper>
     )
 }

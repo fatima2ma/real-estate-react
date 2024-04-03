@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { styled } from "styled-components";
-import { FaRegImages } from "react-icons/fa";
+import { FaRegImages, FaRedo } from "react-icons/fa";
 
 const InputContainer = styled.div`
     flex: 0 1 100%;
@@ -45,7 +45,7 @@ const Icon = styled(FaRegImages)`
 `;
 
 const ProgressBar = styled.span.attrs(props => ({progress: props.progress || '0'}))`
-    width: ${props => props.progress}px;
+    width: ${props => props.progress}%;
     height: 5px;
     display: block;
     background-color: green;
@@ -56,7 +56,7 @@ const ImageWrap = styled.div.attrs(props => ({progress: props.progress || '0'}))
     position: relative;
     overflow: hidden;
 
-    &:before{
+    &.newImgs:before{
         content:'${props => props.progress}%';
         transition: all 1.5s ease;
         width: 150px;
@@ -70,12 +70,22 @@ const ImageWrap = styled.div.attrs(props => ({progress: props.progress || '0'}))
         justify-content: center;
         color: #fafafa;
     }
+
+    &.blur img{
+        filter: blur(1px);
+    }
+`;
+
+const SubTitle = styled.h4`
+    margin: 1rem 0;
+    color: gray;
 `;
 
 const Image = styled.img`
     width: 150px;
     height: 100px;
-    object-fit: cover;    
+    object-fit: cover;  
+    box-shadow: 0px 0px 4px #000;  
 `;
 
 const DeleteIcon = styled.span`
@@ -85,10 +95,35 @@ const DeleteIcon = styled.span`
     cursor: pointer;
     margin: 3px;
     text-shadow: 1px 1px 3px #d1d1d1;
+    transition: all 0.3s ease;
 
+    &:hover{
+        transform: scale(1.2);
+        // color: #af0000;
+    }
 `;
 
-function DisplayImages({files, progress, setFiles, onChange}){
+const RedoIcon = styled(FaRedo)`
+    position: absolute;
+    line-height: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+    text-shadow: 1px 1px 3px #d1d1d1;
+    z-index:2;
+    transition: all 0.5s ease;
+
+    &:hover{
+        transform: rotate(330deg);
+    }
+`;
+
+function DisplayImages({files, progress, setFiles, oldImages, setOldImages, mustDeleteImgs, setMustDeleteImgs, onChange, deleteImage}){
+    console.log('oldimages:', oldImages);
+    console.log('must delete images:', mustDeleteImgs);    
+
+    // useEffect()
 
     const hiddenFileInput = useRef(null);
 
@@ -105,20 +140,49 @@ function DisplayImages({files, progress, setFiles, onChange}){
         fileInput.files = newFileList.files;
         document.querySelector('.inputFiles').dispatchEvent(new Event("change", { bubbles: true }));
     }
+
+    function handleDelete(imgUrl){
+        let temp = oldImages.filter(img => img != imgUrl);
+        setOldImages(temp);
+        setMustDeleteImgs(prev => [...prev, imgUrl]);
+    }
+
+    function cancleDelete(imgUrl){
+        let temp = mustDeleteImgs.filter(img => img != imgUrl);
+        setOldImages(prev => [...prev, imgUrl]);
+        setMustDeleteImgs(temp);
+    }
     return(
         <>
-         <InputContainer>
+        <InputContainer>
             <input className="inputFiles" ref={hiddenFileInput} onChange={onChange} type='file' name='files' multiple='true' style={{display:'none'}} accept='.png,.jpg,.jpeg' />
             <InputFileBtn type='button' onClick={handleClick}>
                 <IconWrap><Icon></Icon></IconWrap>
                 Upload Images
             </InputFileBtn>            
         </InputContainer>
-        {files.map((file, key) =>
+        {oldImages &&  
+        oldImages.map((file, key) =>
             <ImageWrap progress={progress}>
+                <DeleteIcon onClick={() => handleDelete(file)}>x</DeleteIcon>
+                <Image src={file} alt={`Image ${file.name}`} width="100" />
+                {/* <ProgressBar key={key} progress={progress}></ProgressBar> */}
+            </ImageWrap>
+        )}
+        {files.map((file, key) =>
+            <ImageWrap className="newImgs" progress={progress}>
                 <DeleteIcon onClick={() => excludeFile(file)}>x</DeleteIcon>
                 <Image src={URL.createObjectURL(file)} alt={`Image ${file.name}`} width="100" />
                 <ProgressBar key={key} progress={progress}></ProgressBar>
+            </ImageWrap>
+        )}
+        {mustDeleteImgs.length > 0 && 
+        <SubTitle>Submit to delete completely Or undo deletion</SubTitle>
+        }{mustDeleteImgs.length > 0 && mustDeleteImgs.map((file, key) =>
+            <ImageWrap className="blur" progress={progress}>
+                <RedoIcon onClick={() => cancleDelete(file)}/>
+                <Image src={file} alt={`Image ${file.name}`} width="100" />
+                {/* <ProgressBar key={key} progress={progress}></ProgressBar> */}
             </ImageWrap>
         )}
         </>
