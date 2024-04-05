@@ -1,4 +1,4 @@
-import { useCallback, createContext } from "react";
+import { useCallback, createContext, useState } from "react";
 import { db } from "../firebase.config";
 import {getAuth,
         signOut, 
@@ -15,16 +15,19 @@ export const AuthContextProvider = (({children}) => {
     const auth = getAuth();
     const navigate = useNavigate();
 
+    const [signed, setSigned] = useState('bending');
+
     const SigninAuth = useCallback(async(email, password) => {
         signInWithEmailAndPassword(auth, email, password)
             .then(userCredential => {
             const user = userCredential.user;
-            if(user) navigate('/');
+            if(user) setSigned(true);
         }).catch(error => {
+            setSigned(false);
             console.log(error.code);
             console.log(error.message);
         });
-    },[]);
+    },[signed]);
 
     const SignUpAuth = useCallback(async(username, email, password) => {
         try{
@@ -62,6 +65,7 @@ export const AuthContextProvider = (({children}) => {
         if(auth.currentUser)
         signOut(auth).then(() => {
             navigate('/');
+            setSigned('bending');
         }).catch((error) => {
             console.log(error.code);
             console.log(error.message);
@@ -69,7 +73,7 @@ export const AuthContextProvider = (({children}) => {
     },[]);
 
     return(
-        <AuthContext.Provider value={{updateAuth, updatePassword, SigninAuth, signOutAuth, SignUpAuth}}>
+        <AuthContext.Provider value={{updateAuth, updatePassword, SigninAuth, signOutAuth, SignUpAuth, signed, setSigned}}>
             {children}
         </AuthContext.Provider>
     )

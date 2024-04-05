@@ -15,7 +15,12 @@ const Btn = styled.button.attrs(props => ({$backColor: props.backColor || 'green
     border-radius: 5px;
     align-self: center;
     padding: 0.3rem .5rem;
+    filter: drop-shadow(0px 1px 1px #333);
+    transition: all .3s ease;
 
+    &:hover{
+        filter: hue-rotate(25deg);
+    }
     &:disabled{
         display: flex;
         align-items: center;

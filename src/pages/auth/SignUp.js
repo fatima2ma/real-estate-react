@@ -3,7 +3,7 @@ import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import FormItem from '../../components/FormItem';
 import SectionWrraper from '../../components/SectionWrraper';
-import Wrraper2col from '../../components/Wrraper2col';
+import MidWrraper from '../../components/MidWrraper';
 import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,7 @@ const Form = styled.form`
     flex-direction: column;
     justify-content: center;
     gap: 2rem;
+    text-align: start;
 `;
 
 const LinkSt = styled(Link)`
@@ -53,19 +54,19 @@ function SignUp(){
         SignUpAuth(username, email, password);
     }
     return(
-        <SectionWrraper classStyle='shadow'>
-        <Wrraper2col>
+        // <SectionWrraper classStyle='shadow'>
+        <MidWrraper>
         <Form onSubmit={onSubmit}>
-            <SectionHeader title='SignUp' subTitle='Welcome with us please write the required information'/>
+            <SectionHeader title='Join Us'/>
             <FormItem onChange={onChange} title='User Name' type='text' placeholder='write yor name please...' lbl='username'/>
             <FormItem onChange={onChange} title='User Email' type='email' placeholder='write yor email please...' lbl='email'/>
             <FormItem onChange={onChange} title='Password' type='Password' placeholder='write yor password please...' lbl='password'/>
             <LinkSt to='../signin'>already have an account</LinkSt>
             <Button type='submit' title='SignUp'/>
         </Form>
-        <CardImg src='https://picsum.photos/200'/>
-        </Wrraper2col>
-        </SectionWrraper>
+        {/* <CardImg src='https://picsum.photos/200'/> */}
+        </MidWrraper>
+        // </SectionWrraper>
     )
 };
 

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useContext, useState } from 'react';
 import FormItem from '../../components/FormItem';
 import SectionWrraper from '../../components/SectionWrraper';
-import Wrraper2col from '../../components/Wrraper2col';
+import MidWrraper from '../../components/MidWrraper';
 import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
@@ -14,6 +14,7 @@ const Form = styled.form`
     flex-direction: column;
     justify-content: center;
     gap: 2rem;
+    text-align: start;
 `;
 
 const LinkSt = styled(Link)`
@@ -42,17 +43,17 @@ function ForgotPassword(){
     }
     
     return(
-        <SectionWrraper classStyle='shadow'>
-        <Wrraper2col>
+        // <SectionWrraper classStyle='shadow'>
+        <MidWrraper>
         <Form onSubmit={onSubmit}>
-            <SectionHeader title='Forgot Password' subTitle='please write the required information'/>
-            <FormItem onChange={onChange} title='User Email' type='email' placeholder='write yor email please...' lbl='email'/>
+            <SectionHeader title='Forgot Password'/>
+            <FormItem onChange={onChange} title='write your email to send a link to reset password' type='email' placeholder='write yor email please...' lbl='email'/>
             <LinkSt to='../signin'>SignIn</LinkSt>
             <Button type='submit' title='Reset'/>
         </Form>
-        <CardImg src='https://picsum.photos/200'/>
-        </Wrraper2col>
-        </SectionWrraper>
+        {/* <CardImg src='https://picsum.photos/200'/> */}
+        </MidWrraper>
+        // </SectionWrraper>
     )
 };
 

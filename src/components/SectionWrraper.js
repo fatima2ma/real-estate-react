@@ -8,6 +8,10 @@ const SectionWrrap = styled.div`
     @media (max-width: 575px){
         padding: 0;
     }
+
+    &.fixedWidth{
+        max-width: 1000px;
+    }
 `;
 
 const Section = styled.div`
@@ -21,7 +25,7 @@ const Section = styled.div`
 
 function SectionWrraper({children, classStyle}){
     return(
-        <SectionWrrap>
+        <SectionWrrap className={classStyle? classStyle:''}>
         <Section className={classStyle? classStyle:''}>
             {children}
         </Section>
