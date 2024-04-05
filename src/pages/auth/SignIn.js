@@ -133,6 +133,9 @@ const CardImg = styled.div`
         gap: 1rem;
         color: #e1e1e1;
         overflow: hidden;
+        @media (max-width: 840px){
+            text-align: center;
+        }
         & *{
             transition: all 1.5s ease;
             transform: translateY(1000px);
