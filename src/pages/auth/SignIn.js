@@ -136,15 +136,15 @@ const CardImg = styled.div`
         @media (max-width: 840px){
             text-align: center;
         }
-        & *{
+        & > *{
             transition: all 1.5s ease;
             transform: translateY(1000px);
             opacity: 0;
         }
-        &.failed *{
+        &.failed > *{
            text-shadow: 2px 2px 1px #8f0101; 
         }
-        &.success *{
+        &.success > *{
             text-shadow: 2px 2px 1px green; 
         }
     }
@@ -158,7 +158,7 @@ const CardImg = styled.div`
         border-radius: 5px;
         box-shadow: 1px 1px 0px 0px transparent;
 
-        & .feedBack *{
+        & .feedBack > *{
             transform: translateY(0px);
             opacity: 1;
         }
@@ -251,7 +251,7 @@ function SignIn(){
                             </Texts> 
                         : <Texts className='feedBack failed'>
                             <h4 className='subtitle'></h4>
-                            <p className='desc'></p><LoadBtn/></Texts> }
+                            <p className='desc'><LoadBtn/></p></Texts> }
                     </CardImg>
                 </WrapTrans>
             </Wrraper2col>

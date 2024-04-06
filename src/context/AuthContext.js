@@ -39,12 +39,13 @@ export const AuthContextProvider = (({children}) => {
                     email: auth.currentUser.email,
                     username: auth.currentUser.displayName,
                 });
-                auth.currentUser && navigate('/profile');
+                auth.currentUser && setSigned(true);
             }catch(error) {
+                setSigned(false);
                 console.log(error.code);
                 console.log(error.message);
             }
-    },[]);
+    },[signed]);
 
     const updateAuth = useCallback(async (username) => {
         if(auth.currentUser.displayName && auth.currentUser.displayName !== username )

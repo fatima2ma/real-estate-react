@@ -151,9 +151,12 @@ function Profile(){
                     deleteClick={() => onDeleteClick(item.id)}/>
             )}
             </CardsWrraper>
-            <Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
+            {places.length <= 0 ?
+            <p className='desc'>You don't add any place yet.</p>
+            :<Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
                 {loadMore? <LoadBtn/> : ''}
             </Button>
+            }
         </>
         )}        
         </SectionWrraper>
