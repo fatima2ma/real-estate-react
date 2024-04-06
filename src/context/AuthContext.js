@@ -16,6 +16,7 @@ export const AuthContextProvider = (({children}) => {
     const navigate = useNavigate();
 
     const [signed, setSigned] = useState('bending');
+    const [updated, setUpdated] = useState('bending');
 
     const SigninAuth = useCallback(async(email, password) => {
         signInWithEmailAndPassword(auth, email, password)
@@ -57,10 +58,12 @@ export const AuthContextProvider = (({children}) => {
     const updatePassword = useCallback(async (email) => {
         try{
             await sendPasswordResetEmail(auth, email);
+            setUpdated(true);
         }catch(error){
+            setUpdated(false);
             console.log(error.message);
         }
-    },[]);
+    },[updated]);
 
     const signOutAuth = useCallback(() => {
         if(auth.currentUser)
@@ -74,7 +77,7 @@ export const AuthContextProvider = (({children}) => {
     },[]);
 
     return(
-        <AuthContext.Provider value={{updateAuth, updatePassword, SigninAuth, signOutAuth, SignUpAuth, signed, setSigned}}>
+        <AuthContext.Provider value={{updateAuth, updatePassword, SigninAuth, signOutAuth, SignUpAuth, signed, setSigned, updated, setUpdated}}>
             {children}
         </AuthContext.Provider>
     )
