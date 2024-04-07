@@ -9,6 +9,15 @@ const Title = styled.h3`
 const SubTitle = styled(Link)`
     color: #276ce7;
     font-size: 13px;
+    transition: all .3s ease;
+    text-decoration: underline;
+    text-decoration-thickness: 0px;
+    text-decoration-color: transparent;
+
+    &:hover{
+        text-decoration-thickness: 1px;
+        text-decoration-color: currentColor;
+    }
 `;
 
 const Section_header = styled.div`

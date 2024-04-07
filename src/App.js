@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {BrowserRouter, Routes, Route, Outlet} from 'react-router-dom';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import Offers from './pages/Offers';
 import Places from './pages/Places';
 import PlaceDetail from './pages/PlaceDetail';
@@ -44,6 +45,7 @@ function App() {
             <Route path="/forgotpassword" element={<ForgotPassword/>}/>
             <Route path="/cards" element={<CardsWithcolumns/>}/>
           </Routes>
+          <Footer/>
         </AppContext>
     </div>
     </BrowserRouter>    

@@ -7,15 +7,17 @@
   width: 100%;
 }
 .App{
+  min-height: 100vh;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .App li{
   list-style-type: none;
 }
 
-.App a{
+a{
     text-decoration: none;
-/*    color: #333;*/
 }
 
 /*

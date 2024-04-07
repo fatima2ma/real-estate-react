@@ -2,12 +2,12 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import NavbarItem from '../components/NavbarItem';
 import Btn from '../components/Button';
-import { getAuth} from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
 const HeaderWrap = styled.div`
-//    width: 100vw;
+    width: 100%;
     max-width: 1400px;
     height: 40px;
     padding: 0 6rem;
@@ -47,6 +47,11 @@ const CustLink = styled(Link)`
     border-radius: 5px;
     align-self: center;
     padding: .3rem .7rem;
+    transition: all .3s ease;
+
+    &:hover{
+        filter: saturate(1.5);
+    }
 `;
 
 function Header(){
