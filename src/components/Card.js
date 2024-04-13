@@ -35,6 +35,7 @@ const CardLink = styled(Link)`
 const Thumb = styled.img`
     width: 100%;
     height: 60%;
+    aspect-ratio: 9 / 6;
     object-fit: cover;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;

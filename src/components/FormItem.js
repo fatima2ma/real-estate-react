@@ -21,7 +21,7 @@ const Input = styled.input`
     padding: 1rem;
 `;
 
-function FormItem({title ,lbl, type, placeholder, onChange, multiple=false, min, max, accept, maxLength, minLength, step='', value}){
+function FormItem({title ,lbl, type, placeholder, onChange, multiple=false, min, max, accept, maxLength, disabled=false, minLength, step='', value}){
     return(
         <InputWrrap>
             <Lbl htmlFor={lbl}>{title}</Lbl>
@@ -37,7 +37,8 @@ function FormItem({title ,lbl, type, placeholder, onChange, multiple=false, min,
                 accept={accept}
                 maxLength={maxLength}
                 minLength={minLength}
-                step={step}/>
+                step={step}
+                disabled={disabled}/>
         </InputWrrap>
     )
 }

@@ -112,10 +112,10 @@ function Profile(){
         <>
         <SectionWrraper classStyle=''>
         <MidWrraper>
-        <SectionHeader title='My Profiel' subTitle=''/>
+        <SectionHeader title='My Profile' subTitle=''/>
         <Form onSubmit={onSubmit}>
-            <FormItem type='email' placeholder='write yor email please...' onChange={onChange} lbl='email' value={formDataUser.email} id='email'/>
-            <FormItem type='text' placeholder='write yor name please...' onChange={onChange} lbl='username' value={formDataUser.username} id='username'/>
+            <FormItem type='email' title='Email' placeholder='write yor email please...' disabled={true} onChange={onChange} lbl='email' value={formDataUser.email} id='email'/>
+            <FormItem type='text' title='Uesr Name' placeholder='write yor name please...' onChange={onChange} lbl='username' value={formDataUser.username} id='username'/>
             {/*<FormItem type='Password' placeholder='write yor password please...' lbl='password'/>*/}
             <Btns>
                 <LinkSt to='/'>Sign out</LinkSt>
@@ -165,3 +165,5 @@ function Profile(){
 };
 
 export default Profile;
+
+// https://www.prama.gr

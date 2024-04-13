@@ -119,7 +119,7 @@ const RedoIcon = styled(FaRedo)`
     }
 `;
 
-function DisplayImages({files, progress, setFiles, oldImages, setOldImages, mustDeleteImgs, setMustDeleteImgs, onChange, deleteImage}){
+function DisplayImages({files, progress, setFiles, oldImages = [], setOldImages, mustDeleteImgs = [], setMustDeleteImgs, onChange, deleteImage}){
     console.log('oldimages:', oldImages);
     console.log('must delete images:', mustDeleteImgs);    
 
@@ -169,7 +169,7 @@ function DisplayImages({files, progress, setFiles, oldImages, setOldImages, must
                 {/* <ProgressBar key={key} progress={progress}></ProgressBar> */}
             </ImageWrap>
         )}
-        {files.map((file, key) =>
+        {files && files.map((file, key) =>
             <ImageWrap className="newImgs" progress={progress}>
                 <DeleteIcon onClick={() => excludeFile(file)}>x</DeleteIcon>
                 <Image src={URL.createObjectURL(file)} alt={`Image ${file.name}`} width="100" />

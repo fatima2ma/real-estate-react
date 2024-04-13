@@ -6,13 +6,13 @@ import styled from 'styled-components';
 const FooterDiv = styled.footer`
     background-color: #2e2e2e;
     box-shadow: 0px 0px 0px .1rem #276ce7;
-    padding: 1rem 6rem;
+    padding: .9rem 6rem;
     color: #fff;
     margin-top: auto;
-    font-size: 13px;
+    font-size: 12px;
 
     & p {
-        padding: .5rem 0;
+        // padding: .5rem 0;
         text-align: center;
     }
 `;
