@@ -19,6 +19,10 @@ const Input = styled.input`
     height: 35px;
     border-radius: 5px;
     padding: 1rem;
+
+    &:disabled{
+        background: #ddd;
+    }
 `;
 
 function FormItem({title ,lbl, type, placeholder, onChange, multiple=false, min, max, accept, maxLength, disabled=false, minLength, step='', value}){

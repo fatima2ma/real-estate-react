@@ -1,4 +1,5 @@
 import {useState, useCallback, createContext} from 'react';
+import { useParams } from 'react-router-dom';
 import { db } from '../firebase.config';
 import { collection, getDocs, query, where, limit, startAfter, doc, deleteDoc } from 'firebase/firestore';
 
@@ -9,8 +10,10 @@ export const CategoryContextProvider = ({children}) => {
     const [loading, setLoading] = useState(true);
     const [lastFetched, setLastFetched] = useState();
     const [loadMore, setLoadMore] = useState(false);
+    const params = useParams();
     
     const fetchData = useCallback(async (fieldName, operator, value) => {
+        console.log('cat');
         try{
             const q = query(collection(db, 'places'), where(fieldName, operator, value), limit(4));
             const data = await getDocs(q);
@@ -25,13 +28,14 @@ export const CategoryContextProvider = ({children}) => {
                     })
                 })
             }
+            console.log(tempList);
             setPlaces(tempList);
             setLoading(false);
         }catch(e){
             setLoading(false);
             console.log(e.message);
         }
-    },[]);
+    },[places]);
 
     const fetchMoreData = useCallback(async(fieldName, operator, value, lastFetched) => {
         setLoadMore(true);
@@ -41,7 +45,7 @@ export const CategoryContextProvider = ({children}) => {
             if(data){
                 const lastVisible = data.docs[data.docs.length - 1];
                 setLastFetched(lastVisible);
-                console.log(lastFetched);
+                // console.log(lastFetched);
                 const tempList = [];
                 data.forEach(dataItem => {
                     tempList.push({

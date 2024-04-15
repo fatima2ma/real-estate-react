@@ -26,6 +26,7 @@ const MainContent = styled.div`
 
 function Categoreis(){
     const params = useParams();
+    console.log(params.categoryName);
     const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
 
     function handlefetchMoreData(){
@@ -33,7 +34,8 @@ function Categoreis(){
     }
     
     useEffect(() => {
-        params.categoryName && !places.length && fetchData('type', '==', params.categoryName);
+        fetchData('type', '==', params.categoryName);
+        console.log(places);
     },[params.categoryName]);
 
     const [tree, setTree] = useState({

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
@@ -25,6 +26,8 @@ const MainContent = styled.div`
 `;
 
 function Offers(){
+    const params = useParams();
+    console.log(params.categoryName);
     const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
 
     function handlefetchMoreData(){
@@ -33,7 +36,7 @@ function Offers(){
     
     useEffect(() => {
        fetchData('offer', '==', true); 
-    },[]);
+    },[params.categoryName]);
 
     const [tree, setTree] = useState({
         title: 'squareThumb',

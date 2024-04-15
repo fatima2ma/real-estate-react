@@ -7,10 +7,10 @@ function useDataFetching(){
     const [rentplaces, setRentplaces] = useState([]);
     const [loading, setLoading] = useState(true);
     const [ImagesSliderURLs, setImagesSliderURLs] = useState(null);    
-    console.log('fetch');
+    // console.log('fetch');
     useEffect(() => {
         async function fetchData(){
-            console.log('fetch');
+            // console.log('fetch');
             const tempSellData = [];
             const tempRentData = [];
             const tempSlider = [];
@@ -24,7 +24,7 @@ function useDataFetching(){
                     });
                     setLoading(false);
                 }
-                console.log(tempSellData);
+                // console.log(tempSellData);
                 setSellplaces(tempSellData);
                 setRentplaces(tempRentData);
                 setImagesSliderURLs(tempSlider[0]);

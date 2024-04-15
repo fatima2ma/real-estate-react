@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useState} from 'react';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
+import Hero from '../components/Hero';
 import Card from '../components/Card';
 import Slider from '../components/Slider';
 import LoadingWrapp from '../components/LoadingWrapp';
@@ -61,7 +62,8 @@ function Home(){
                 </SectionLoading>
             </SectionWrraper>) : (
         <div>
-        <Slider data={ImagesSliderURLs}/> 
+        <Hero/>
+        {/* <Slider data={ImagesSliderURLs}/>  */}
         <SectionWrraper>
         <SectionHeader title='Rent offers' subTitle='Show more places' category='rent'/>
         <CardsWrraper>

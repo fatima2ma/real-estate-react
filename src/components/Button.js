@@ -17,8 +17,14 @@ const Btn = styled.button.attrs(props => ({$backColor: props.backColor || 'green
     padding: 0.3rem .5rem;
     filter: drop-shadow(0px 1px 1px #333);
     transition: all .3s ease;
-
-    &:hover{
+    
+    &.shadow{
+        box-shadow: 1px 1px 1px #eee;
+        &:hover{
+            box-shadow: 1px 1px 2px #333;
+        }
+    }
+    &:hover:not(.shadow){
         filter: hue-rotate(25deg);
     }
     &:disabled{
@@ -32,9 +38,9 @@ const Btn = styled.button.attrs(props => ({$backColor: props.backColor || 'green
 
 `;
 
-function Button({children, title, type, backColor, width, onClick, disabled, gridCol, lineHeight}){
+function Button({children, classStyle,title, type, backColor, width, onClick, disabled, gridCol, lineHeight}){
     return(
-        <Btn onClick={onClick} type={type} backColor={backColor} width={width} lineHeight={lineHeight} gridCol={gridCol} disabled={disabled}>{title} {children}</Btn>
+        <Btn onClick={onClick} className={classStyle} type={type} backColor={backColor} width={width} lineHeight={lineHeight} gridCol={gridCol} disabled={disabled}>{title} {children}</Btn>
     )
 }
 

@@ -35,8 +35,14 @@ const Btns = styled.div`
 const LinkSt = styled(Link)`
     font-size: 14px;
     font-weight: bold;
-    color: #276ce7;
+    color: #eee;
     order: 2;
+    border: 1px solid #eee;
+    padding: .3rem;
+
+    &:hover{
+        color: #fff;
+    }
 `;
 
 const CardsWrraper = styled.ul`
@@ -110,16 +116,16 @@ function Profile(){
 
     return(
         <>
-        <SectionWrraper classStyle=''>
+        <SectionWrraper classStyle='darkCard'>
         <MidWrraper>
         <SectionHeader title='My Profile' subTitle=''/>
         <Form onSubmit={onSubmit}>
             <FormItem type='email' title='Email' placeholder='write yor email please...' disabled={true} onChange={onChange} lbl='email' value={formDataUser.email} id='email'/>
-            <FormItem type='text' title='Uesr Name' placeholder='write yor name please...' onChange={onChange} lbl='username' value={formDataUser.username} id='username'/>
+            <FormItem type='text' title='User Name' placeholder='write yor name please...' onChange={onChange} lbl='username' value={formDataUser.username} id='username'/>
             {/*<FormItem type='Password' placeholder='write yor password please...' lbl='password'/>*/}
             <Btns>
                 <LinkSt to='/'>Sign out</LinkSt>
-                <Button type='submit' backColor='gray' title='Update'/>
+                <Button type='submit' classStyle='shadow' backColor='#3949AB' title='Update'/>
             </Btns>
         </Form>
         </MidWrraper>
@@ -167,3 +173,4 @@ function Profile(){
 export default Profile;
 
 // https://www.prama.gr
+// https://www.w3.org/WAI/ARIA/apg/#dialog_modal
