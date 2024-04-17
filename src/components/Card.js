@@ -18,6 +18,7 @@ const CardLink = styled(Link)`
     color: #000;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1rem;
 //    height: 100%;
 `;
 
@@ -81,17 +82,22 @@ const Title = styled.h3`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: gray;
 `;
 
 const Price = styled.p`
     font-size: 12px;
     font-weight: bold;
-    color: gray;
+
+    & > b{
+        font-size: 20px;
+    }
 `;
 
 const Feature = styled.span`
     font-size: 12px;
     font-weight: bold;
+    color: gray;
 
     &&:last-child{
         margin:0 1rem;
@@ -105,7 +111,7 @@ const Controls = styled.div`
     justify-content: end;
     color: gray;
     font-size: 14px;
-    padding: 1rem;
+    padding: 0 1rem 1rem;
 
     && > *{
     transform: scale(1);
@@ -122,7 +128,7 @@ const Controls = styled.div`
     }
 `;
 
-function Card({title, thumbnail, padge, price, location, beds, baths, deleteClick, id=''}){
+function Card({title, thumbnail, padge, price, location, beds, baths, deleteClick, id='', controls = false}){
     const navigate = useNavigate();
     return(
         <CardWrrap>
@@ -132,12 +138,17 @@ function Card({title, thumbnail, padge, price, location, beds, baths, deleteClic
                     <Padge>{padge}</Padge>
                     <Location><Icon/> {location}</Location>
                     <Title>{title}</Title>
-                    <Price>{price} / month</Price>
+                    <Price><b>{price}</b> / month</Price>
                     <span><Feature>{beds} Beds</Feature> 
                     <Feature> {baths} Baths</Feature></span>                    
                 </CardText>
             </CardLink>
-        <Controls><FaPen onClick={()=>navigate(`/place/${id}/edit`)}/> <FaTrashCan className='red' onClick={deleteClick}/></Controls>
+        {controls &&    
+        <Controls>
+            <FaPen onClick={()=>navigate(`/place/${id}/edit`)}/> 
+            <FaTrashCan className='red' onClick={deleteClick}/>
+        </Controls>
+        }
         </CardWrrap>
     )
 }

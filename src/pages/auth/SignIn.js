@@ -9,10 +9,8 @@ import SectionHeader from '../../components/SectionHeader';
 import Button from '../../components/Button';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
-import img from '../../tired.png';
 import { getAuth } from 'firebase/auth';
 import LoadBtn from '../../components/LoadBtn';
-// import { useAuthStatus } from '../../hooks/useAuthStatus';
 
 const Form = styled.form`
     margin: 2rem 0;

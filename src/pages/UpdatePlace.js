@@ -1,6 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import {styled} from 'styled-components';
+import { toast } from "react-toastify";
+import { getAuth } from "firebase/auth";
 import Button from '../components/Button';
 import FormItem from '../components/FormItem';
 import TextAreaItem from '../components/TextAreaItem';
@@ -10,6 +13,7 @@ import CheckItem from '../components/CheckItem';
 import ItemContext from '../context/ItemContext';
 import DisplayImages from '../components/DisplayImages';
 import Wrraper2col from '../components/Wrraper2col';
+import LoadingModal from '../components/LoadingModal';
 
 const CenteredForm = styled.div`
     width: 40vw;
@@ -48,6 +52,8 @@ const ExtendedItem = styled.div`
 function UpdatePlace(){
     const params = useParams();
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+    const auth = getAuth();
     // const [place, setPlace] = useState({});
     // const [loading, setLoading] = useState(true);
     const [files, setFiles] = useState([]);
@@ -67,7 +73,7 @@ function UpdatePlace(){
         images:[],
     });
 
-    const {placeData, id, loading, error, progress, fetchItem, updateItem, deleteImage} = useContext(ItemContext);
+    const {placeData, id, loading, error, updated, progress, fetchItem, updateItem, deleteImage} = useContext(ItemContext);
     
     const {
        type,
@@ -89,9 +95,20 @@ function UpdatePlace(){
     
     useEffect(() => {
         fetchItem(params.id);
-        console.log(placeData);
         getFormData();
-    },[loading, id]);
+    },[id]);
+
+    useEffect(() => {
+        updated && toast.success('Place updated successfuly');
+        updated && setShowModal(false);
+    },[updated]);
+
+    useEffect(() => {
+        if (placeData && placeData.userRef !== auth.currentUser.uid) {
+          toast.error("You can't edit this listing");
+          navigate("/");
+        }
+      }, [auth.currentUser.uid, navigate]);
 
     function getFormData(){
         (!loading && placeData.geolocation.lng != undefined) && setFormData({
@@ -129,6 +146,7 @@ function UpdatePlace(){
         // console.log(formData.images);
         deleteImage(mustDeleteImgs);
         updateItem(formData, params.id, oldImages);
+        setShowModal(true);
         //if(error == '') navigate(`/place/${params.id}`);
     };
     return(
@@ -168,6 +186,7 @@ function UpdatePlace(){
                 </AddForm>
                 )}
             {/* </CenteredForm> */}
+            {showModal && createPortal(<LoadingModal setShowModal={() => setShowModal(!showModal)}/>, document.body)}
         </SectionWrraper>
     )
 }

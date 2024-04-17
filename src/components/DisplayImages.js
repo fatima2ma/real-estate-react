@@ -120,11 +120,7 @@ const RedoIcon = styled(FaRedo)`
 `;
 
 function DisplayImages({files, progress, setFiles, oldImages = [], setOldImages, mustDeleteImgs = [], setMustDeleteImgs, onChange, deleteImage}){
-    console.log('oldimages:', oldImages);
-    console.log('must delete images:', mustDeleteImgs);    
-
-    // useEffect()
-
+   
     const hiddenFileInput = useRef(null);
 
     function handleClick(e){

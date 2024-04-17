@@ -3,14 +3,17 @@ import { db } from "../firebase.config";
 import { getAuth } from 'firebase/auth';
 import {getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject} from 'firebase/storage';
 import { addDoc, collection, serverTimestamp, getDoc, doc, updateDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export const ItemContext = createContext();
 
 export const ItemContextProvider = ({children}) => {
+    const navigate = useNavigate();
     const initialData = {
         placeData: {},
         id:'',
         loading: true,
+        updated: false,
         progress: 0,
         error: '',
     };
@@ -37,6 +40,7 @@ export const ItemContextProvider = ({children}) => {
                     placeData: [state.placeData, action.payload.dataCopy],
                     progress: action.payload.prog,
                     loading: false,
+                    updated: action.payload.updated,
                 };
             case 'UPDATE_PLACE_DATA_ERROR':
                 return{
@@ -76,7 +80,7 @@ export const ItemContextProvider = ({children}) => {
             if(data){
                 // setPlaceData(data.data());
                 // setLoading(false);
-                console.log(data.id);
+                //console.log(data.id);
                 dispatch({type: 'GET_PLACE_SUCCESS', payload: {id:data.id, data:data.data()}});
             }
         }catch(e){
@@ -100,6 +104,7 @@ export const ItemContextProvider = ({children}) => {
 
     const updateItem = useCallback(async (data, id, oldImages) => {
         //let progress = [];
+        //state.updated = true;
         async function uploadImages(image){
             const storage = getStorage();
             const date = new Date();            
@@ -129,7 +134,6 @@ export const ItemContextProvider = ({children}) => {
                 }
             })
         }
-        //console.log(data);
         //upload images
             let imagesURLs = [];
             if(data.images != undefined){
@@ -139,7 +143,6 @@ export const ItemContextProvider = ({children}) => {
                     console.log(error.message);
                 })
             }
-            //console.log(imagesURLs[0]); 
             delete data.images;
             imagesURLs = [...imagesURLs, ...oldImages];
             // imagesURLs.map((image) => deleteImage(image));
@@ -157,7 +160,7 @@ export const ItemContextProvider = ({children}) => {
         try{    
             const docRef = doc(db, "places", id);
             await updateDoc(docRef, dataCopy);
-            dispatch({type:'UPDATE_PLACE_DATA', payload: {dataCopy: dataCopy, prog: state.progress }});
+            dispatch({type:'UPDATE_PLACE_DATA', payload: {dataCopy: dataCopy, updated: true, prog: state.progress }});
         }catch(e){
             dispatch({type: 'UPDATE_PLACE_DATA_ERROR', payload: e.message})
         }
@@ -222,10 +225,12 @@ export const ItemContextProvider = ({children}) => {
         try{
             const docRef = await addDoc(collection(db, 'places'), formDataCopy);
             if(docRef){
+                console.log(docRef.id);
                 dispatch({
                     type: 'ADD_PLACE_SUCCESS',
                     payload: {formDataCopy: formDataCopy, prog: progress}
-                })
+                });
+                navigate(`/place/${docRef.id}`);
             }
         }catch(e){
             dispatch({type: 'ADD_PLACE_ERROR', payload: e.message})

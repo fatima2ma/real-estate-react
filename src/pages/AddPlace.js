@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState} from 'react';
 import {styled} from 'styled-components';
+import { createPortal } from 'react-dom';
 import Button from '../components/Button';
 import FormItem from '../components/FormItem';
 import TextAreaItem from '../components/TextAreaItem';
@@ -8,8 +9,9 @@ import SectionHeader from '../components/SectionHeader';
 import CheckItem from '../components/CheckItem';
 import ItemContext from '../context/ItemContext';
 import Wrraper2col from '../components/Wrraper2col';
-import InputFileUpload from '../components/InputFileUpload';
 import DisplayImages from '../components/DisplayImages';
+import LoadingModal from '../components/LoadingModal';
+import { useNavigate } from 'react-router-dom';
 
 const CenteredForm = styled.div`
     width: 40vw;
@@ -62,7 +64,8 @@ function AddPlace(){
     });
 
     const [files, setFiles] = useState([]);
-    const {addPlace, progress} = useContext(ItemContext);
+    const {addPlace, placeData, placeID, progress, loading} = useContext(ItemContext);
+    const [showModal, setShowModal] = useState(false);
     
     function onChange(e){
         let boolean = null;
@@ -85,9 +88,16 @@ function AddPlace(){
        }
     };
     
+    useEffect(()=>{
+        !loading && setShowModal(false);
+        //loading && placeID && navigate(`/place/${placeID}`);
+    },[loading])
+
     async function onSubmit(e){
         e.preventDefault();
-        addPlace(formData);       
+        addPlace(formData); 
+        setShowModal(true);
+        //submitBtn.current.disabled = true;  
     }
 
     return(
@@ -115,12 +125,12 @@ function AddPlace(){
                     <FormItem type='number' title='Reguler Price' lbl='price' onChange={onChange} min='50' max='400000000'/>
                 </section>
                 <ExtendedItem>
-                    {/* <InputFileUpload onChange={onChange} files={files}/>  */}
                     <DisplayImages files={files} progress={progress} setFiles={setFiles} onChange={onChange}/>                 
                 </ExtendedItem>
                 <Button title='add place' type='submit' width='50%' gridCol='1'/>
             </Wrraper2col>
             </AddForm>
+            {showModal && createPortal(<LoadingModal setShowModal={() => setShowModal(!showModal)}/>, document.body)}
         </SectionWrraper>
     )
 }

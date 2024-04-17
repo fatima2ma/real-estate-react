@@ -1,15 +1,17 @@
 import styled from 'styled-components';
 import { useState} from 'react';
+import { getAuth } from 'firebase/auth';
+import { toast } from 'react-toastify';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Hero from '../components/Hero';
 import Card from '../components/Card';
-import Slider from '../components/Slider';
 import LoadingWrapp from '../components/LoadingWrapp';
 import SectionLoading from '../components/SectionLoading';
 import Loading from '../components/Loading';
 import { useContext } from 'react';
 import DataContext from '../context/DataContext';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CardsWrraper = styled.ul`
     display: grid;
@@ -21,8 +23,14 @@ const CardsWrraper = styled.ul`
 
 
 function Home(){
+    const auth = getAuth();
     const {sellplaces, rentplaces, loading, ImagesSliderURLs} = useContext(DataContext);
-   
+    function onDeleteClick(id, userRef){
+        if (userRef !== auth.currentUser.uid) {
+            console.log(auth.currentUser.uid, userRef);
+            toast.error("You can't edit this listing");
+          };
+    }
     const [tree, setTree] = useState({
         title: 'squareThumb',
         thumbnail: true,
@@ -63,7 +71,6 @@ function Home(){
             </SectionWrraper>) : (
         <div>
         <Hero/>
-        {/* <Slider data={ImagesSliderURLs}/>  */}
         <SectionWrraper>
         <SectionHeader title='Rent offers' subTitle='Show more places' category='rent'/>
         <CardsWrraper>
@@ -75,7 +82,8 @@ function Home(){
                 price={place.data.price}
                 location={place.data.adress}
                 beds={place.data.beds}
-                baths={place.data.baths}/>
+                baths={place.data.baths}
+                deleteClick={() => onDeleteClick(place.id, place.data.userRef)}/>
         ))}
         </CardsWrraper>
         </SectionWrraper>
@@ -90,7 +98,8 @@ function Home(){
                 price={place.data.price}
                 location={place.data.adress}
                 beds={place.data.beds}
-                baths={place.data.baths}/>
+                baths={place.data.baths}
+                deleteClick={() => onDeleteClick(place.id, place.data.userRef)}/>
         ))}
         </CardsWrraper>
         </SectionWrraper>

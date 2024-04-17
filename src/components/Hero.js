@@ -21,7 +21,6 @@ const HeroImg = styled.img`
 `;
 
 const HeroIntro = styled.div`
-    // margin: 2.5rem 0;
     text-align: center;
     color: #fff;
     text-shadow: rgba(0, 0, 0, 0.25) 0px 1px 3px;

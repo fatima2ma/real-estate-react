@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { useState, useEffect, useContext } from 'react';
+import { createPortal } from 'react-dom';
 import { getAuth } from 'firebase/auth';
+import { toast } from "react-toastify";
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
@@ -14,6 +16,7 @@ import Loading from '../components/Loading';
 import LoadBtn from '../components/LoadBtn';
 import CategoryContext from '../context/CategoryContext';
 import AuthContext from '../context/AuthContext';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Form = styled.form`
     margin: 2rem 0;
@@ -55,6 +58,9 @@ const CardsWrraper = styled.ul`
 
 function Profile(){
     const auth = getAuth();
+    const [showModal, setShowModal] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState('');
     const [formDataUser, setFormDataUser] = useState({
         email: auth.currentUser.email,
         username: auth.currentUser.displayName,
@@ -62,11 +68,19 @@ function Profile(){
     const {email, username} = formDataUser;
 
     const {updateAuth} = useContext(AuthContext);
-    const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData, deleteData } = useContext(CategoryContext);
+    const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData, deleteData, deleted} = useContext(CategoryContext);
     
     useEffect(() =>{
        fetchData('userRef', '==', auth.currentUser.uid);
     },[auth.currentUser.uid]);
+
+    useEffect(() =>{
+        console.log(deleted);
+        if(deleted) {
+            setShowModal(false);
+            toast.success('Place deleted successfuly');
+        }
+     },[deleted]);
 
     function handlefetchMoreData(){
         fetchMoreData('userRef', '==', auth.currentUser.uid, lastFetched);
@@ -84,8 +98,14 @@ function Profile(){
         updateAuth(username);       
     }
     
-    function onDeleteClick(id){
-        deleteData(id);
+    function onDeleteClick(id, userRef){
+        if (userRef !== auth.currentUser.uid) {
+            toast.error("You can't edit this listing");
+          }else{ 
+            setItemToDelete(id);
+            setShowModal(true);
+            console.log(itemToDelete);
+          }
     }
 
     const [tree, setTree] = useState({
@@ -154,7 +174,8 @@ function Profile(){
                     location={item.data.adress}
                     beds={item.data.beds}
                     baths={item.data.baths}
-                    deleteClick={() => onDeleteClick(item.id)}/>
+                    deleteClick={() => onDeleteClick(item.id, item.data.userRef)}
+                    controls={true}/>
             )}
             </CardsWrraper>
             {places.length <= 0 ?
@@ -164,7 +185,9 @@ function Profile(){
             </Button>
             }
         </>
-        )}        
+        )}
+
+        {showModal && createPortal(<ConfirmModal deleted={deleted} deleteData={()=> deleteData(itemToDelete)} setShowModal={() => setShowModal(!showModal)} setConfirmDelete={() => setConfirmDelete(!confirmDelete)}/>, document.body)}      
         </SectionWrraper>
         </>
     )

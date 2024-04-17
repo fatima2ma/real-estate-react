@@ -10,6 +10,7 @@ export const CategoryContextProvider = ({children}) => {
     const [loading, setLoading] = useState(true);
     const [lastFetched, setLastFetched] = useState();
     const [loadMore, setLoadMore] = useState(false);
+    const [deleted, setDeleted] = useState(false);
     const params = useParams();
     
     const fetchData = useCallback(async (fieldName, operator, value) => {
@@ -66,12 +67,14 @@ export const CategoryContextProvider = ({children}) => {
         try{
             const result = await deleteDoc(doc(db, 'places', id));
             setPlaces(places.filter(place => place.id !== id));
+            setDeleted(true);
+            setTimeout(()=> setDeleted(false),[500]);
         }catch(error){
             console.log(error);
         }
     })
     return(
-        <CategoryContext.Provider value={{places, loading, lastFetched, loadMore, fetchData, fetchMoreData, deleteData}}>
+        <CategoryContext.Provider value={{places, deleted,loading, lastFetched, loadMore, fetchData, fetchMoreData, deleteData}}>
             {children}
         </CategoryContext.Provider>
     )

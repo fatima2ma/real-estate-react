@@ -38,9 +38,9 @@ const Btn = styled.button.attrs(props => ({$backColor: props.backColor || 'green
 
 `;
 
-function Button({children, classStyle,title, type, backColor, width, onClick, disabled, gridCol, lineHeight}){
+function Button({children, ref, classStyle,title, type, backColor, width, onClick, disabled, gridCol, lineHeight}){
     return(
-        <Btn onClick={onClick} className={classStyle} type={type} backColor={backColor} width={width} lineHeight={lineHeight} gridCol={gridCol} disabled={disabled}>{title} {children}</Btn>
+        <Btn ref={ref} onClick={onClick} className={classStyle} type={type} backColor={backColor} width={width} lineHeight={lineHeight} gridCol={gridCol} disabled={disabled}>{title} {children}</Btn>
     )
 }
 
