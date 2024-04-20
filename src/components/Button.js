@@ -10,6 +10,7 @@ const Btn = styled.button.attrs(props => ({$backColor: props.backColor || 'green
     cursor: pointer;
     color: white;
     width: ${props => props.$width};
+    min-width: fit-content;
     text-align: center;
     font-weight: bold;
     border-radius: 5px;

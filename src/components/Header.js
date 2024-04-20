@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
 import NavbarItem from '../components/NavbarItem';
-import Btn from '../components/Button';
+import Button from '../components/Button';
 import { getAuth } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
@@ -54,6 +54,10 @@ const CustLink = styled(Link)`
     }
 `;
 
+const MainLink = styled(Link)`
+    color: #333;
+`; 
+
 function Header(){
     const auth = getAuth();
     const navigate = useNavigate();
@@ -67,14 +71,14 @@ function Header(){
     return(
         <HeaderWrap>
             <ElemsWrap>
-            <LogoText>RealTor.com</LogoText>
+            <LogoText><MainLink to='/home' className='mainLink'>RealTor.com</MainLink></LogoText>
             <NavCont className='navBarCont'>
-                <NavbarItem title='Home' to='/home'/>
+                <NavbarItem title='Places' to='/places'/>
                 <NavbarItem title='Offers' to='/offers'/>
                 <NavbarItem title='Profile' to='/profile'/>              
             </NavCont>
         {auth.currentUser ? 
-            <Btn type='button' onClick={logout} title='logout' backColor='gray' width='auto' lineHeight='unset'/>
+            <Button type='button' onClick={logout} title='logout' backColor='gray' width='auto' lineHeight='unset'/>
             :
             <CustLink to='./signin'>Login</CustLink>
         }

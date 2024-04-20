@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
-import Slider from '../components/Slider';
 import Button from '../components/Button';
 import LoadingWrapp from '../components/LoadingWrapp';
 import SectionLoading from '../components/SectionLoading';
@@ -27,7 +26,6 @@ const MainContent = styled.div`
 
 function Offers(){
     const params = useParams();
-    console.log(params.categoryName);
     const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
 
     function handlefetchMoreData(){
