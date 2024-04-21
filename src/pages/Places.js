@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SectionWrraper from '../components/SectionWrraper';
 import SectionHeader from '../components/SectionHeader';
 import Card from '../components/Card';
@@ -8,14 +8,12 @@ import Button from '../components/Button';
 import LoadingWrapp from '../components/LoadingWrapp';
 import SectionLoading from '../components/SectionLoading';
 import Loading from '../components/Loading';
-import LoadBtn from '../components/LoadBtn';
+//import LoadBtn from '../components/LoadBtn';
 import { useContext } from 'react';
-import CategoryContext from '../context/CategoryContext';
-import { FaFilter } from "react-icons/fa";
-import { BiSolidOffer } from "react-icons/bi";
-import { FaFilterCircleDollar } from "react-icons/fa6";
-import { MdCategory } from "react-icons/md";
-import { FaRegStar } from "react-icons/fa6";
+//import CategoryContext from '../context/CategoryContext';
+import { FilterContext } from '../context/FilterContext';
+import FilterBar from '../components/FilterBar';
+import DataContext from '../context/DataContext';
 
 const CardsWrraper = styled.ul`
     display: grid;
@@ -34,77 +32,22 @@ const TowColContainer = styled.div`
     flex: 1 0 100%;
 `;
 
-const FilterbarShow = styled.aside`
-    background: #333;
-    padding: 1rem;
-    max-width: 3rem;
-    transition: all .4s ease;
-
-    &.active{
-        max-width: 200px; 
-    }
-`;
-
-const FilterBar = styled.ul`
-    // border: 1px solid #fff;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    color: #fff;
-    & > .filterSection{
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        min-height: 30px;
-        
-        & .filter-icon{
-            font-size: 15px;
-        }
-    }
-
-    &  .check-group{
-        display: flex;
-        align-items: center;
-        gap: .5rem;            
-        height: 0;
-        font-size: 14px;
-        opacity: 0;
-        transform-origin: left;
-        transform: scaleX(0) translateX(-30px);
-        transition: all .4s ease;
-
-        & > label{
-            line-height: 30px;
-        }
-    }
-    
-    &.active  .check-group{
-        height: 30px;
-        opacity: 1;
-        transform: scaleX(1) translateX(0px);
-    } 
-`;
-
-const FilterBtn = styled.button`
-  background: transparent;
-  cursor: pointer;
-  color: #fff;
-  margin-bottom: 1rem
-`;
-
 function Places() {
-  const params = useParams();
-  const [showFilter, setShowFilter] = useState(false);
-  const {places, loading, lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
+    const navigate = useNavigate();
+    const {alldata, loading} = useContext(DataContext);
+    const { places, initialPlacesList} = useContext(FilterContext);
+    // const [loading, setLoading] = useState(true);
+    // const { lastFetched, loadMore, fetchData, fetchMoreData} = useContext(CategoryContext);
+    // const {sellplaces, rentPlaces, placesData, loading} = useDataFetching(); 
 
-    function handlefetchMoreData(){
-        fetchMoreData('title', '!=', ' ', lastFetched);
-    }
-    
+    // function handlefetchMoreData(){
+    //     fetchMoreData('title', '!=', ' ', lastFetched);
+    // }
+
     useEffect(() => {
-       fetchData('title', '!=', ' '); 
-    },[params.categoryName]);
+        console.log(alldata);
+        initialPlacesList(alldata);       
+    },[navigate, loading]);
 
     const [tree, setTree] = useState({
       title: 'squareThumb',
@@ -133,54 +76,7 @@ function Places() {
   });
   return (
     <TowColContainer>
-      <FilterbarShow className={showFilter? 'active' : ''}>
-      <FilterBtn onClick={() => setShowFilter(!showFilter)}>
-        <FaFilter/>
-      </FilterBtn>
-        <FilterBar className={showFilter? 'active' : ''}>            
-            <li className='filterSection'>
-                <span><FaFilterCircleDollar className='filter-icon'/></span>
-                <div className='check-group'>
-                    <input type='radio' name='price' id='price-low'/>
-                    <label htmlFor='price-low'>low</label>
-                </div>
-                <div className='check-group'>
-                    <input type='radio' name='price' id='price-high'/>
-                    <label htmlFor='price-high'>high</label>
-                </div>
-            </li>
-            <li className='filterSection'>
-                <span><BiSolidOffer className='filter-icon'/></span>
-                <div className='check-group'>
-                    <input type='radio' name='offer' id='offer'/>
-                    <label htmlFor='offer'>offer</label>
-                </div>
-            </li>
-            <li className='filterSection'>
-            <span><MdCategory className='filter-icon'/></span>
-                <div className='check-group'>
-                    <input type='radio' name='type' id='sell'/>
-                    <label htmlFor='sell'>sell</label>
-                </div>
-                <div className='check-group'>
-                    <input type='radio' name='type' id='rent'/>
-                    <label htmlFor='rent'>rent</label>
-                </div>
-            </li>
-            <li className='filterSection'>
-                <span><FaRegStar className='filter-icon'/></span>
-                <div className='check-group'>
-                    <input type='radio' name='rate' id='rate-low'/>
-                    <label htmlFor='rate-low'>low</label>
-                </div>
-                <div className='check-group'>
-                    <input type='radio' name='rate' id='rate-high'/>
-                    <label htmlFor='rate-high'>high</label>
-                </div>
-            </li>
-        </FilterBar>
-      
-      </FilterbarShow>
+      <FilterBar places={places}/>
     <SectionWrraper>
             {loading? (<>
                 <SectionLoading>
@@ -209,9 +105,9 @@ function Places() {
                     />
                 )}
             </CardsWrraper>
-            <Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
+            {/* <Button onClick={handlefetchMoreData} disabled={loadMore} type='button' backColor='#276ce7' width='25%' title='Load more'>
                 {loadMore? <LoadBtn/> : ''}
-            </Button>
+            </Button> */}
             </MainContent>
             </>
             )}

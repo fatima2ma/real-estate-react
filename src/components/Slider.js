@@ -5,9 +5,13 @@ import 'swiper/css/bundle';
 import { Pagination, Navigation, EffectFade, Autoplay, A11y } from 'swiper/modules';
 import { FaShare } from 'react-icons/fa6';
 
+const SlideContainer = styled.div`
+    width: 100%;
+`;
+
 const Slide = styled.div`
     width: 100%;
-    height: 300px;
+    height: 400px;
     position: relative;
     overflow: hidden;
 `;
@@ -28,11 +32,7 @@ const ShareIcon = styled.div`
         display: inline-block;
         content:'Copied to clipboard';
         width: max-content;
-//        height: 35px;
         background: #eee;
-//        position: absolute;
-//        top: 50px;
-//        left: 50%;
         padding: 0.5rem 1rem;
         text-align: center;
         font-size: 12px;
@@ -52,25 +52,13 @@ const IconWrapper = styled.span`
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 0 1px #eee;
-//    position: relative;
 
-//    &.shared:before{
-//        content:'Copied to clipboard';
-//        width: max-content;
-////        height: 35px;
-//        background: #eee;
-//        position: absolute;
-//        top: 50px;
-//        left: 50%;
-//        padding: 0 0.5rem;
-//        text-align: center;
-//        font-size: 12px;
-//    }
 `;
 
 function Slider({data, sharedIcon}){
     const [shared, setShared] = useState(false);
     return(
+        <SlideContainer>
         <Swiper
             pagination={{type: 'progressbar',}}
             navigation={true}
@@ -100,6 +88,7 @@ function Slider({data, sharedIcon}){
             </SwiperSlide>
         ))}
         </Swiper>
+        </SlideContainer>
     )
 }
 

@@ -6,28 +6,30 @@ function useDataFetching(){
     const [sellplaces, setSellplaces] = useState([]);
     const [rentplaces, setRentplaces] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [alldata, setAlldata] = useState([]);
     const [ImagesSliderURLs, setImagesSliderURLs] = useState(null);    
     // console.log('fetch');
     useEffect(() => {
         async function fetchData(){
-            // console.log('fetch');
             const tempSellData = [];
             const tempRentData = [];
-            const tempSlider = [];
+            const tempAlldata  = [];
+            //const tempSlider = [];
             try{
                 const queryData = await getDocs(collection(db, 'places'), limit(4));
                 if(queryData){
                     queryData.forEach(doc => {
                         doc.data().type === 'rent' ? tempRentData.push({id:doc.id, data: doc.data()}) 
                         : tempSellData.push({id:doc.id, data: doc.data()});
-                        tempSlider.push(doc.data().imagesURLs);
+                        //tempSlider.push(doc.data().imagesURLs);
+                        tempAlldata.push({id:doc.id, data: doc.data()});
                     });
                     setLoading(false);
                 }
-                // console.log(tempSellData);
                 setSellplaces(tempSellData);
                 setRentplaces(tempRentData);
-                setImagesSliderURLs(tempSlider[0]);
+                setAlldata(tempAlldata);
+                //setImagesSliderURLs(tempSlider[0]);
             }catch(error){
                 console.log(error);
                 setLoading(false);
@@ -35,7 +37,7 @@ function useDataFetching(){
         };
         fetchData();
     },[]);
-    return [sellplaces, rentplaces, loading, ImagesSliderURLs];
+    return [sellplaces, rentplaces, alldata, loading];
 }
 
 export default useDataFetching;

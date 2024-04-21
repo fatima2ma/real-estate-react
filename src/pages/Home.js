@@ -24,7 +24,7 @@ const CardsWrraper = styled.ul`
 
 function Home(){
     const auth = getAuth();
-    const {sellplaces, rentplaces, loading, ImagesSliderURLs} = useContext(DataContext);
+    const {sellplaces, rentplaces, loading} = useContext(DataContext);
     function onDeleteClick(id, userRef){
         if (userRef !== auth.currentUser.uid) {
             console.log(auth.currentUser.uid, userRef);

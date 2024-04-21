@@ -4,9 +4,9 @@ import useDataFetching from '../hooks/useDataFetching';
 export const DataContext = createContext();
 
 export const DataContextProvider = ({children}) => {
-    const [sellplaces, rentplaces, loading, ImagesSliderURLs] = useDataFetching();
+    const [sellplaces, rentplaces, alldata, loading, ImagesSliderURLs] = useDataFetching();
     return(
-        <DataContext.Provider value={{sellplaces, rentplaces, loading, ImagesSliderURLs}}>
+        <DataContext.Provider value={{sellplaces, rentplaces, alldata, loading, ImagesSliderURLs}}>
             {children}
         </DataContext.Provider>
     )
