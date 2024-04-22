@@ -42,7 +42,8 @@ function FormItem({title ,lbl, type, placeholder, onChange, multiple=false, min,
                 maxLength={maxLength}
                 minLength={minLength}
                 step={step}
-                disabled={disabled}/>
+                disabled={disabled}
+                required/>
         </InputWrrap>
     )
 }
