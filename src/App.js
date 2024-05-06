@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import {BrowserRouter, Routes, Route, Outlet} from 'react-router-dom';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -18,6 +18,7 @@ import UpdatePlace from './pages/UpdatePlace';
 import PrivateRoute from './components/PrivateRoute';
 import Categoreis from './pages/Categoreis';
 import AppContext from './context/AppContext';
+import NotFound from './pages/NotFound';
 
 function App() {
   return ( 
@@ -45,6 +46,7 @@ function App() {
             <Route path="/signup" element={<SignUp/>}/>
             <Route path="/forgotpassword" element={<ForgotPassword/>}/>
             <Route path="/cards" element={<CardsWithcolumns/>}/>
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
           <Footer/>
         </AppContext>
